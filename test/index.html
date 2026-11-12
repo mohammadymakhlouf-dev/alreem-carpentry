@@ -810,7 +810,12 @@ async function driveRequest(url, options, grant, binary = false) {
     if (driveGrant === grant) disconnectDrive(false);
     throw Error('انتهى إذن Google Drive. أعد الربط من الإعدادات.');
   }
-  if (!response.ok) throw Error('تعذّر الوصول إلى النسخة في Google Drive. تحقق من تفعيل Drive API وإذن الحساب.');
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const reason = body?.error?.errors?.[0]?.reason || body?.error?.status;
+    const detail = typeof reason === 'string' && /^[a-z0-9_]+$/i.test(reason) ? ' · ' + reason : '';
+    throw Error('تعذّر الوصول إلى Google Drive (' + response.status + detail + ').');
+  }
   return binary ? response.arrayBuffer() : response.json();
 }
 
@@ -834,8 +839,8 @@ async function openDriveRestore() {
     let pageToken;
     do {
       const query = new URLSearchParams({
-        q: "trashed = false and appProperties has { key='alreemBackupDevice' }",
-        fields: 'nextPageToken,files(id,name,modifiedTime,size)',
+        q: "trashed = false",
+        fields: 'nextPageToken,files(id,name,modifiedTime,size,appProperties)',
         orderBy: 'modifiedTime desc',
         pageSize: '100'
       });
@@ -843,6 +848,7 @@ async function openDriveRestore() {
       const page = await driveRequest('https://www.googleapis.com/drive/v3/files?' + query,{},grant);
       if (!active()) return;
       for (const file of page.files || []) {
+        if (!file.appProperties?.alreemBackupDevice) continue;
         const row = document.createElement('li');
         const button = document.createElement('button');
         button.type = 'button';
