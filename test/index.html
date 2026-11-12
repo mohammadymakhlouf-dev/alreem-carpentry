@@ -16,7 +16,7 @@
 #trashDialog{width:min(1100px,96vw)}#trashDialog .row{margin:24px 0}.trash-actions{min-width:170px}.trash-actions button{margin:3px}#trashCount{background:#47685b;border-radius:12px;padding:2px 7px;margin-right:5px;font-size:11px}@media print{#trashDialog{display:none!important}}
 .whatsapp-button{color:#13744d;border-color:#b8ddc8;background:#f3fbf5}.whatsapp-button:hover{background:#e3f6e9}.phone-number{font-variant-numeric:tabular-nums;unicode-bidi:isolate}.share-step{border:1px solid #dce8dc;border-radius:12px;padding:20px;margin:18px 0}.share-step p{font-size:13px;line-height:1.9;color:#637765}.whatsapp-link{display:inline-block;background:#187a50;color:white;padding:12px 20px;border-radius:9px;text-decoration:none;cursor:pointer}#whatsappDialog{width:min(600px,94vw)}@media print{#whatsappDialog{display:none!important}}
 .account-actions .icon-action{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:9px;flex:0 0 42px}.icon-action svg{display:block;pointer-events:none}.icon-action:focus-visible{outline:3px solid #bd9663;outline-offset:2px}.preferences-dialog{width:min(530px,94vw)}.preferences-dialog form{display:grid;gap:9px}.preferences-dialog p{margin:4px 0;line-height:1.65}.preferences-dialog .row{margin-top:12px}#loginFeedback{color:#a42e2e}
-</style><header><div><span class="brand-icon">▥</span><h1>منجرة الريم</h1><small>إدارة الحسابات والدفعات</small></div><span class="testflag">نسخة تجريبية مستقلة</span><div class="navlabel">مساحة العمل</div><div class="navitem selected">▦ &nbsp; الحسابات</div><button class="navitem nav-secondary" onclick="openStatements()">↙ &nbsp; الدفعات وكشوف الحساب</button><button class="navitem nav-secondary" onclick="openTrash()">سلة المحذوفات <span id="trashCount">0</span></button><div class="sidebar-bottom">منجرة الريم<br>إدارة بسيطة. حسابات واضحة.<br><span style="color:#789e8b">الإصدار التجريبي 2.6.9</span></div><button class="navitem nav-secondary" onclick="openSettings()">⚙ الإعدادات</button></header><main><div class="pagebar"><span>مساحة العمل &nbsp; / &nbsp; <b>الحسابات</b></span><span class="account-label"><span class="avatar">ر</span> منجرة الريم</span></div><div class="top"><div><div class="eyebrow">الإدارة المالية</div><h2>حساباتك، بوضوح.</h2><small id="today"></small></div><button class="primary" onclick="newAccount()">＋ إضافة حساب</button></div><div class="cards"><div class="card">إجمالي المتبقي لنا<strong class="green" id="ours"></strong><span class="caption">أرصدة مستحقة للتحصيل</span></div><div class="card">إجمالي المتبقي علينا<strong class="red" id="theirs"></strong><span class="caption">التزامات مستحقة للدفع</span></div><div class="card">صافي الرصيد <span class="muted">(لنا − علينا)</span><strong id="net"></strong><span class="caption">الفرق بين حقوقك والتزاماتك</span></div></div><div class="section-title">سجل الحسابات <span class="counter" id="accountCount">0 حساب</span></div><div class="status-tabs" role="group" aria-label="حالة الحساب"><button id="status-unpaid" onclick="setStatusFilter('unpaid')">غير مسددة</button><button id="status-paid" onclick="setStatusFilter('paid')">مسددة</button><button id="status-all" onclick="setStatusFilter('all')">جميع الحسابات</button></div><p class="status-hint">الحسابات المسددة والأرصدة لصالح الزبون تظهر ضمن فلتر «مسددة». البحث يشمل القائمة والحالة المختارتين.</p><div class="toolbar"><div class="tabs"><button id="tab-us" class="active" onclick="switchTab('us')">لنا (حساب)</button><button id="tab-them" onclick="switchTab('them')">علينا (حساب)</button></div><input id="search" placeholder="البحث باسم العميل، الصنف أو رقم الشيك…" oninput="render()"><button onclick="backup()">تصدير نسخة مشفّرة ↓</button><button onclick="document.getElementById('restore').click()">استيراد نسخة ↑</button><input type="file" id="restore" accept=".alreembak,.xlsx,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,application/octet-stream" tabindex="-1" style="position:fixed;left:-10000px;top:0;width:1px;min-width:0;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="restoreFile(this)"></div><div class="panel"><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>نوع الصنف</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="list"></tbody></table></div><div id="empty" class="empty"><span class="empty-icon">▤</span>دفترك جاهز لأول حساب<br><p class="muted">ابدأ بإضافة حسابك الأول، ثم سجّل دفعاته بسهولة.</p><button onclick="newAccount()">＋ إضافة حساب</button></div></div><p class="notice">هذه نسخة تجريبية مستقلة عن الصفحة الأساسية. البيانات تُحفظ تلقائيًا في هذا المتصفح ولا تتزامن بين الأجهزة. النسخ الجديدة مشفّرة وتشمل الحسابات والدفعات وسلة المحذوفات. يمكنك استيراد النسخ القديمة أيضًا.</p><div class="backupbar"><span id="backupDate">لم تُصدّر نسخة احتياطية بعد</span><span>العملة: شيكل إسرائيلي · ₪ &nbsp; <span id="exporting"></span></span></div></main><dialog id="settingsDialog" class="preferences-dialog" aria-labelledby="settingsTitle">
+</style><header><div><span class="brand-icon">▥</span><h1>منجرة الريم</h1><small>إدارة الحسابات والدفعات</small></div><span class="testflag">نسخة تجريبية مستقلة</span><div class="navlabel">مساحة العمل</div><div class="navitem selected">▦ &nbsp; الحسابات</div><button class="navitem nav-secondary" onclick="openStatements()">↙ &nbsp; الدفعات وكشوف الحساب</button><button class="navitem nav-secondary" onclick="openTrash()">سلة المحذوفات <span id="trashCount">0</span></button><div class="sidebar-bottom">منجرة الريم<br>إدارة بسيطة. حسابات واضحة.<br><span style="color:#789e8b">الإصدار التجريبي 2.6.10</span></div><button class="navitem nav-secondary" onclick="openSettings()">⚙ الإعدادات</button></header><main><div class="pagebar"><span>مساحة العمل &nbsp; / &nbsp; <b>الحسابات</b></span><span class="account-label"><span class="avatar">ر</span> منجرة الريم</span></div><div class="top"><div><div class="eyebrow">الإدارة المالية</div><h2>حساباتك، بوضوح.</h2><small id="today"></small></div><button class="primary" onclick="newAccount()">＋ إضافة حساب</button></div><div class="cards"><div class="card">إجمالي المتبقي لنا<strong class="green" id="ours"></strong><span class="caption">أرصدة مستحقة للتحصيل</span></div><div class="card">إجمالي المتبقي علينا<strong class="red" id="theirs"></strong><span class="caption">التزامات مستحقة للدفع</span></div><div class="card">صافي الرصيد <span class="muted">(لنا − علينا)</span><strong id="net"></strong><span class="caption">الفرق بين حقوقك والتزاماتك</span></div></div><div class="section-title">سجل الحسابات <span class="counter" id="accountCount">0 حساب</span></div><div class="status-tabs" role="group" aria-label="حالة الحساب"><button id="status-unpaid" onclick="setStatusFilter('unpaid')">غير مسددة</button><button id="status-paid" onclick="setStatusFilter('paid')">مسددة</button><button id="status-all" onclick="setStatusFilter('all')">جميع الحسابات</button></div><p class="status-hint">الحسابات المسددة والأرصدة لصالح الزبون تظهر ضمن فلتر «مسددة». البحث يشمل القائمة والحالة المختارتين.</p><div class="toolbar"><div class="tabs"><button id="tab-us" class="active" onclick="switchTab('us')">لنا (حساب)</button><button id="tab-them" onclick="switchTab('them')">علينا (حساب)</button></div><input id="search" placeholder="البحث باسم العميل، الصنف أو رقم الشيك…" oninput="render()"><button onclick="backup()">تصدير نسخة مشفّرة ↓</button><button onclick="document.getElementById('restore').click()">استيراد نسخة ↑</button><input type="file" id="restore" accept=".alreembak,.xlsx,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,application/octet-stream" tabindex="-1" style="position:fixed;left:-10000px;top:0;width:1px;min-width:0;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="restoreFile(this)"></div><div class="panel"><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>نوع الصنف</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="list"></tbody></table></div><div id="empty" class="empty"><span class="empty-icon">▤</span>دفترك جاهز لأول حساب<br><p class="muted">ابدأ بإضافة حسابك الأول، ثم سجّل دفعاته بسهولة.</p><button onclick="newAccount()">＋ إضافة حساب</button></div></div><p class="notice">هذه نسخة تجريبية مستقلة عن الصفحة الأساسية. البيانات تُحفظ تلقائيًا في هذا المتصفح ولا تتزامن بين الأجهزة. النسخ الجديدة مشفّرة وتشمل الحسابات والدفعات وسلة المحذوفات. يمكنك استيراد النسخ القديمة أيضًا.</p><div class="backupbar"><span id="backupDate">لم تُصدّر نسخة احتياطية بعد</span><span>العملة: شيكل إسرائيلي · ₪ &nbsp; <span id="exporting"></span></span></div></main><dialog id="settingsDialog" class="preferences-dialog" aria-labelledby="settingsTitle">
   <h2 id="settingsTitle">الإعدادات</h2>
   <form id="backupSettingsForm">
     <label for="backupMode">النسخ الاحتياطي التلقائي بعد كل حفظ</label>
@@ -26,8 +26,10 @@
       <option id="folderMode" value="folder">حفظ في مجلد أختاره</option>
     </select>
     <p id="folderSupport" class="muted"></p>
+    <a id="openStandaloneBackup" hidden target="_blank" rel="noopener">فتح التطبيق في تبويب مستقل</a>
     <p id="backupFolderName"></p>
     <button id="chooseBackupFolder" type="button" onclick="chooseBackupFolder()">اختيار مجلد</button>
+    <button id="chooseBackupFile" type="button" onclick="chooseBackupLocation(true)">اختيار ملف النسخة</button>
     <button type="submit" class="primary">حفظ الإعدادات</button>
     <p id="autoBackupStatus" role="status" aria-live="polite"></p>
   </form>
@@ -256,10 +258,11 @@ function queueAutomaticBackup() {
     } else {
       const folder = await backupStore(store => store.get('folder'));
       if (!folder || await folder.queryPermission({mode:'readwrite'}) !== 'granted') {
-        showBackupStatus('الحفظ في المجلد متوقف. افتح الإعدادات واضغط «اختيار مجلد» لإعادة السماح.');
+        showBackupStatus('الحفظ في المجلد متوقف. افتح الإعدادات واختر مكان النسخة مجددًا لإعادة السماح.');
         return;
       }
-      const file = await folder.getFileHandle('AlReem-Auto-Backup.alreembak', {create:true});
+      const file = folder.kind === 'file' ? folder
+        : await folder.getFileHandle('AlReem-Auto-Backup.alreembak', {create:true});
       const stream = await file.createWritable();
       try {
         await stream.write(encrypted);
@@ -276,11 +279,20 @@ function queueAutomaticBackup() {
 async function openSettings() {
   const mode = savedBackupMode();
   $('backupMode').value = mode;
-  $('folderMode').disabled = typeof window.showDirectoryPicker !== 'function';
-  $('chooseBackupFolder').hidden = $('folderMode').disabled;
-  $('folderSupport').textContent = $('folderMode').disabled
-    ? 'هذا المتصفح يدعم النسخ داخل التطبيق. اختيار مجلد يتطلب متصفحًا يدعم الوصول إلى المجلدات.'
-    : 'النسخة الخارجية تُحدّث في ملف AlReem-Auto-Backup.alreembak داخل المجلد المختار.';
+  const embedded = window.top !== window;
+  const folderAvailable = !embedded && typeof window.showDirectoryPicker === 'function';
+  const fileAvailable = !embedded && typeof window.showSaveFilePicker === 'function';
+  $('folderMode').disabled = !folderAvailable && !fileAvailable;
+  $('folderMode').textContent = 'حفظ في مجلد أو ملف أختاره';
+  $('chooseBackupFolder').disabled = !folderAvailable;
+  $('chooseBackupFile').disabled = !fileAvailable;
+  $('openStandaloneBackup').hidden = !embedded;
+  $('openStandaloneBackup').href = window.location.href;
+  $('folderSupport').textContent = embedded
+    ? 'افتح التطبيق في تبويب مستقل لاختيار مكان النسخ على الجهاز.'
+    : folderAvailable || fileAvailable
+      ? 'اختر مجلدًا، أو اضغط «اختيار ملف النسخة» لتحديد مكان الملف مباشرة.'
+      : 'متصفحك لا يتيح اختيار مكان للحفظ التلقائي. استخدم الحفظ داخل التطبيق، أو افتح الرابط مباشرة في Chrome أو Edge على الكمبيوتر.';
   $('autoBackupStatus').textContent = backupStatus;
   $('settingsDialog').showModal();
   try {
@@ -288,7 +300,7 @@ async function openSettings() {
       backupStore(store => store.get('folder')),
       backupStore(store => store.get('latest'))
     ]);
-    $('backupFolderName').textContent = folder ? 'المجلد المختار: ' + folder.name : '';
+    $('backupFolderName').textContent = folder ? backupLocationLabel(folder) : '';
     $('restoreLocalBackup').disabled = !latest;
     if (!backupStatus && latest && mode === 'local') {
       showBackupStatus('آخر نسخة داخل التطبيق: ' + new Date(latest.created).toLocaleString('ar-PS'));
@@ -298,16 +310,43 @@ async function openSettings() {
   }
 }
 
+function backupLocationLabel(handle) {
+  return (handle.kind === 'file' ? 'ملف النسخة: ' : 'المجلد المختار: ') + handle.name;
+}
+
+let choosingBackupLocation = false;
 async function chooseBackupFolder() {
-  if (typeof window.showDirectoryPicker !== 'function') return;
+  await chooseBackupLocation(false);
+}
+
+async function chooseBackupLocation(fileOnly) {
+  if (choosingBackupLocation) return;
+  const method = fileOnly ? 'showSaveFilePicker' : 'showDirectoryPicker';
+  if (typeof window[method] !== 'function' || window.top !== window) {
+    showBackupStatus('افتح التطبيق مباشرة في Chrome أو Edge على الكمبيوتر، أو اختر الحفظ داخل التطبيق.');
+    return;
+  }
+  choosingBackupLocation = true;
+  showBackupStatus('بانتظار اختيار مكان النسخة من نافذة المتصفح…');
   try {
-    const folder = await window.showDirectoryPicker({mode:'readwrite'});
-    await backupStore(store => store.put(folder, 'folder'), 'readwrite');
+    const location = fileOnly
+      ? await window.showSaveFilePicker({
+          id:'alreem-backup-file', startIn:'documents', suggestedName:'AlReem-Auto-Backup.alreembak',
+          types:[{description:'نسخة منجرة الريم المشفّرة',accept:{'application/octet-stream':['.alreembak']}}]
+        })
+      : await window.showDirectoryPicker({id:'alreem-backup-folder',startIn:'documents',mode:'readwrite'});
+    await backupStore(store => store.put(location, 'folder'), 'readwrite');
     $('backupMode').value = 'folder';
-    $('backupFolderName').textContent = 'المجلد المختار: ' + folder.name;
-    showBackupStatus('اضغط «حفظ الإعدادات» لتفعيل النسخ في هذا المجلد.');
+    $('backupFolderName').textContent = backupLocationLabel(location);
+    showBackupStatus('اضغط «حفظ الإعدادات» لتفعيل النسخ في المكان المختار.');
   } catch (error) {
-    if (error.name !== 'AbortError') showBackupStatus('تعذّر اختيار المجلد أو حفظ إذن الوصول إليه.');
+    if (error.name === 'AbortError') {
+      showBackupStatus('لم يُحدَّد مكان للنسخة. يمكنك المحاولة مرة أخرى أو اختيار ملف النسخة مباشرة.');
+    } else {
+      showBackupStatus('تعذّر فتح النافذة أو منح إذن الكتابة. جرّب «اختيار ملف النسخة» أو افتح التطبيق في تبويب مستقل.');
+    }
+  } finally {
+    choosingBackupLocation = false;
   }
 }
 
@@ -316,7 +355,7 @@ $('backupSettingsForm').onsubmit = async event => {
   const mode = $('backupMode').value;
   try {
     if (mode === 'folder' && !await backupStore(store => store.get('folder'))) {
-      showBackupStatus('اختر المجلد أولًا.');
+      showBackupStatus('اختر مجلدًا أو ملفًا للنسخة أولًا.');
       return;
     }
     localStorage.setItem(backupPreferencesKey, mode);
@@ -459,6 +498,7 @@ async function decryptBackup(buffer) {
 requireLocalLogin();
 
 </script></html>
+
 
 
 
