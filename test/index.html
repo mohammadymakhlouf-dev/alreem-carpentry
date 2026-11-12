@@ -28,7 +28,7 @@
     <p id="folderSupport" class="muted"></p>
     <a id="openStandaloneBackup" hidden target="_blank" rel="noopener">فتح التطبيق في تبويب مستقل</a>
     <p id="backupFolderName"></p>
-    <button id="chooseBackupFolder" type="button" onclick="chooseBackupFolder()">اختيار مجلد</button>
+    <button id="chooseBackupFolder" type="button" onclick="chooseBackupLocation(false)">اختيار مجلد</button>
     <button id="chooseBackupFile" type="button" onclick="chooseBackupLocation(true)">اختيار ملف النسخة</button>
     <button type="submit" class="primary">حفظ الإعدادات</button>
     <p id="autoBackupStatus" role="status" aria-live="polite"></p>
@@ -315,10 +315,6 @@ function backupLocationLabel(handle) {
 }
 
 let choosingBackupLocation = false;
-async function chooseBackupFolder() {
-  await chooseBackupLocation(false);
-}
-
 async function chooseBackupLocation(fileOnly) {
   if (choosingBackupLocation) return;
   const method = fileOnly ? 'showSaveFilePicker' : 'showDirectoryPicker';
