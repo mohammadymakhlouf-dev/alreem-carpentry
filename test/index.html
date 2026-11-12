@@ -16,7 +16,8 @@
 #trashDialog{width:min(1100px,96vw)}#trashDialog .row{margin:24px 0}.trash-actions{min-width:170px}.trash-actions button{margin:3px}#trashCount{background:#47685b;border-radius:12px;padding:2px 7px;margin-right:5px;font-size:11px}@media print{#trashDialog{display:none!important}}
 .whatsapp-button{color:#13744d;border-color:#b8ddc8;background:#f3fbf5}.whatsapp-button:hover{background:#e3f6e9}.phone-number{font-variant-numeric:tabular-nums;unicode-bidi:isolate}.share-step{border:1px solid #dce8dc;border-radius:12px;padding:20px;margin:18px 0}.share-step p{font-size:13px;line-height:1.9;color:#637765}.whatsapp-link{display:inline-block;background:#187a50;color:white;padding:12px 20px;border-radius:9px;text-decoration:none;cursor:pointer}#whatsappDialog{width:min(600px,94vw)}@media print{#whatsappDialog{display:none!important}}
 .account-actions .icon-action{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:9px;flex:0 0 42px}.icon-action svg{display:block;pointer-events:none}.icon-action:focus-visible{outline:3px solid #bd9663;outline-offset:2px}.preferences-dialog{width:min(530px,94vw)}.preferences-dialog form{display:grid;gap:9px}.preferences-dialog p{margin:4px 0;line-height:1.65}.preferences-dialog .row{margin-top:12px}#loginFeedback{color:#a42e2e}
-</style><header><div><span class="brand-icon">▥</span><h1>منجرة الريم</h1><small>إدارة الحسابات والدفعات</small></div><span class="testflag">نسخة تجريبية مستقلة</span><div class="navlabel">مساحة العمل</div><div class="navitem selected">▦ &nbsp; الحسابات</div><button class="navitem nav-secondary" onclick="openStatements()">↙ &nbsp; الدفعات وكشوف الحساب</button><button class="navitem nav-secondary" onclick="openTrash()">سلة المحذوفات <span id="trashCount">0</span></button><div class="sidebar-bottom">منجرة الريم<br>إدارة بسيطة. حسابات واضحة.<br><span style="color:#789e8b">الإصدار التجريبي 2.6.10</span></div><button class="navitem nav-secondary" onclick="openSettings()">⚙ الإعدادات</button></header><main><div class="pagebar"><span>مساحة العمل &nbsp; / &nbsp; <b>الحسابات</b></span><span class="account-label"><span class="avatar">ر</span> منجرة الريم</span></div><div class="top"><div><div class="eyebrow">الإدارة المالية</div><h2>حساباتك، بوضوح.</h2><small id="today"></small></div><button class="primary" onclick="newAccount()">＋ إضافة حساب</button></div><div class="cards"><div class="card">إجمالي المتبقي لنا<strong class="green" id="ours"></strong><span class="caption">أرصدة مستحقة للتحصيل</span></div><div class="card">إجمالي المتبقي علينا<strong class="red" id="theirs"></strong><span class="caption">التزامات مستحقة للدفع</span></div><div class="card">صافي الرصيد <span class="muted">(لنا − علينا)</span><strong id="net"></strong><span class="caption">الفرق بين حقوقك والتزاماتك</span></div></div><div class="section-title">سجل الحسابات <span class="counter" id="accountCount">0 حساب</span></div><div class="status-tabs" role="group" aria-label="حالة الحساب"><button id="status-unpaid" onclick="setStatusFilter('unpaid')">غير مسددة</button><button id="status-paid" onclick="setStatusFilter('paid')">مسددة</button><button id="status-all" onclick="setStatusFilter('all')">جميع الحسابات</button></div><p class="status-hint">الحسابات المسددة والأرصدة لصالح الزبون تظهر ضمن فلتر «مسددة». البحث يشمل القائمة والحالة المختارتين.</p><div class="toolbar"><div class="tabs"><button id="tab-us" class="active" onclick="switchTab('us')">لنا (حساب)</button><button id="tab-them" onclick="switchTab('them')">علينا (حساب)</button></div><input id="search" placeholder="البحث باسم العميل، الصنف أو رقم الشيك…" oninput="render()"><button onclick="backup()">تصدير نسخة مشفّرة ↓</button><button onclick="document.getElementById('restore').click()">استيراد نسخة ↑</button><input type="file" id="restore" accept=".alreembak,.xlsx,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,application/octet-stream" tabindex="-1" style="position:fixed;left:-10000px;top:0;width:1px;min-width:0;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="restoreFile(this)"></div><div class="panel"><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>نوع الصنف</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="list"></tbody></table></div><div id="empty" class="empty"><span class="empty-icon">▤</span>دفترك جاهز لأول حساب<br><p class="muted">ابدأ بإضافة حسابك الأول، ثم سجّل دفعاته بسهولة.</p><button onclick="newAccount()">＋ إضافة حساب</button></div></div><p class="notice">هذه نسخة تجريبية مستقلة عن الصفحة الأساسية. البيانات تُحفظ تلقائيًا في هذا المتصفح ولا تتزامن بين الأجهزة. النسخ الجديدة مشفّرة وتشمل الحسابات والدفعات وسلة المحذوفات. يمكنك استيراد النسخ القديمة أيضًا.</p><div class="backupbar"><span id="backupDate">لم تُصدّر نسخة احتياطية بعد</span><span>العملة: شيكل إسرائيلي · ₪ &nbsp; <span id="exporting"></span></span></div></main><dialog id="settingsDialog" class="preferences-dialog" aria-labelledby="settingsTitle">
+.preferences-dialog [hidden]{display:none!important}
+</style><header><div><span class="brand-icon">▥</span><h1>منجرة الريم</h1><small>إدارة الحسابات والدفعات</small></div><span class="testflag">نسخة تجريبية مستقلة</span><div class="navlabel">مساحة العمل</div><div class="navitem selected">▦ &nbsp; الحسابات</div><button class="navitem nav-secondary" onclick="openStatements()">↙ &nbsp; الدفعات وكشوف الحساب</button><button class="navitem nav-secondary" onclick="openTrash()">سلة المحذوفات <span id="trashCount">0</span></button><div class="sidebar-bottom">منجرة الريم<br>إدارة بسيطة. حسابات واضحة.<br><span style="color:#789e8b">الإصدار التجريبي 2.7.0</span></div><button class="navitem nav-secondary" onclick="openSettings()">⚙ الإعدادات</button><button class="navitem nav-secondary" onclick="showSyncSettings()">المزامنة</button><small id="syncState" role="status">الحفظ على هذا الجهاز</small></header><main><div class="pagebar"><span>مساحة العمل &nbsp; / &nbsp; <b>الحسابات</b></span><span class="account-label"><span class="avatar">ر</span> منجرة الريم</span></div><div class="top"><div><div class="eyebrow">الإدارة المالية</div><h2>حساباتك، بوضوح.</h2><small id="today"></small></div><button class="primary" onclick="newAccount()">＋ إضافة حساب</button></div><div class="cards"><div class="card">إجمالي المتبقي لنا<strong class="green" id="ours"></strong><span class="caption">أرصدة مستحقة للتحصيل</span></div><div class="card">إجمالي المتبقي علينا<strong class="red" id="theirs"></strong><span class="caption">التزامات مستحقة للدفع</span></div><div class="card">صافي الرصيد <span class="muted">(لنا − علينا)</span><strong id="net"></strong><span class="caption">الفرق بين حقوقك والتزاماتك</span></div></div><div class="section-title">سجل الحسابات <span class="counter" id="accountCount">0 حساب</span></div><div class="status-tabs" role="group" aria-label="حالة الحساب"><button id="status-unpaid" onclick="setStatusFilter('unpaid')">غير مسددة</button><button id="status-paid" onclick="setStatusFilter('paid')">مسددة</button><button id="status-all" onclick="setStatusFilter('all')">جميع الحسابات</button></div><p class="status-hint">الحسابات المسددة والأرصدة لصالح الزبون تظهر ضمن فلتر «مسددة». البحث يشمل القائمة والحالة المختارتين.</p><div class="toolbar"><div class="tabs"><button id="tab-us" class="active" onclick="switchTab('us')">لنا (حساب)</button><button id="tab-them" onclick="switchTab('them')">علينا (حساب)</button></div><input id="search" placeholder="البحث باسم العميل، الصنف أو رقم الشيك…" oninput="render()"><button onclick="backup()">تصدير نسخة مشفّرة ↓</button><button onclick="document.getElementById('restore').click()">استيراد نسخة ↑</button><input type="file" id="restore" accept=".alreembak,.xlsx,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,application/octet-stream" tabindex="-1" style="position:fixed;left:-10000px;top:0;width:1px;min-width:0;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="restoreFile(this)"></div><div class="panel"><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>نوع الصنف</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="list"></tbody></table></div><div id="empty" class="empty"><span class="empty-icon">▤</span>دفترك جاهز لأول حساب<br><p class="muted">ابدأ بإضافة حسابك الأول، ثم سجّل دفعاته بسهولة.</p><button onclick="newAccount()">＋ إضافة حساب</button></div></div><p class="notice">هذه نسخة تجريبية مستقلة عن الصفحة الأساسية. يمكنك حفظ الحسابات على هذا الجهاز أو تفعيل المزامنة بين أجهزتك. النسخ الجديدة مشفّرة وتشمل الحسابات والدفعات وسلة المحذوفات. يمكنك استيراد النسخ القديمة أيضًا.</p><div class="backupbar"><span id="backupDate">لم تُصدّر نسخة احتياطية بعد</span><span>العملة: شيكل إسرائيلي · ₪ &nbsp; <span id="exporting"></span></span></div></main><dialog id="settingsDialog" class="preferences-dialog" aria-labelledby="settingsTitle">
   <h2 id="settingsTitle">الإعدادات</h2>
   <form id="backupSettingsForm">
     <label for="backupMode">النسخ الاحتياطي التلقائي بعد كل حفظ</label>
@@ -51,10 +52,24 @@
     <p id="loginFeedback" role="status" aria-live="polite"></p>
   </form>
 </dialog>
+<dialog id="syncDialog" class="preferences-dialog" aria-labelledby="syncTitle" oncancel="if(cloudBusy)event.preventDefault()">
+<h2 id="syncTitle">المزامنة بين الأجهزة</h2>
+<p class="muted">استخدم بريد المزامنة وكلمة المرور نفسيهما على كل جهاز. عند الاتصال تُعرض حسابات Firebase. عند قطع الاتصال تعود إلى حسابات هذا الجهاز.</p>
+<form id="syncAuthForm">
+<label for="syncEmail">بريد المزامنة</label><input id="syncEmail" type="email" autocomplete="username" required>
+<label for="syncPassword">كلمة مرور المزامنة</label><input id="syncPassword" type="password" autocomplete="current-password" required minlength="8">
+<label><input id="syncCopyLocal" type="checkbox"> نسخ الحسابات المحلية إلى Firebase عند إنشاء سجل المزامنة لأول مرة</label>
+<button type="submit" class="primary" value="login">اتصال بحساب موجود</button>
+<button type="submit" value="create">إنشاء حساب مزامنة</button>
+</form>
+<p id="syncFeedback" role="status"></p>
+<button id="disconnectSync" hidden onclick="disconnectCloud()">قطع اتصال المزامنة</button>
+<button onclick="if(!cloudBusy)$('syncDialog').close()">إغلاق</button>
+</dialog>
 <dialog id="restoreDialog" oncancel="cancelRestore()"><button class="close" onclick="cancelRestore()" aria-label="إغلاق الاستيراد">✕</button><h2>استيراد نسخة احتياطية</h2><p id="restoreFilename" dir="auto" style="overflow-wrap:anywhere"></p><p id="restoreStatus" role="status" aria-live="polite" style="line-height:1.9"></p><p id="restoreSummary" style="font-weight:bold"></p><p class="muted">استعادة النسخة تستبدل الحسابات والدفعات وسلة المحذوفات الحالية. صدّر نسخة من بياناتك الحالية أولًا إذا أردت الاحتفاظ بها.</p><div class="row"><button class="primary" id="restoreApply" hidden onclick="applyRestore()">استعادة البيانات</button><button onclick="cancelRestore()">إلغاء</button></div></dialog><dialog id="entry"><button class="close" onclick="entry.close()">✕</button><h2 id="entryTitle">إضافة حساب جديد</h2><p id="entryHint" class="muted"></p><form id="accountForm"><label>صاحب الحساب<input name="name" list="customerNames" oninput="fillExistingPhone()" required maxlength="100" placeholder="الاسم الكامل"></label><label>رقم الهاتف (اختياري)<input name="phone" type="tel" dir="ltr" maxlength="30" placeholder="+970599000000 أو 0599000000"><small class="muted">للرقم المحلي نستخدم +970. لرقم آخر أدخل الرمز الدولي كاملًا، مثل +972.</small></label><div class="row"><label>القائمة<select name="side"><option value="us">لنا</option><option value="them">علينا</option></select></label><label>تاريخ الحساب<input name="date" type="date" required></label></div><label>نوع الصنف / البيان<input name="item" required maxlength="200" placeholder="مثال: مواد، بضاعة، خدمات"></label><div class="row"><label>المبلغ بالشيكل<input name="amount" type="number" min="0.01" max="999999999" step="0.01" required></label><label>ملاحظات<input name="notes" maxlength="500"></label></div><datalist id="customerNames"></datalist><button class="primary" id="accountSubmit">حفظ الحساب</button></form></dialog><dialog id="statements"><button class="close" onclick="document.getElementById('statements').close()">✕</button><small>منجرة الريم</small><h2>الدفعات وكشوف الحساب</h2><div class="row statement-filters"><label>البحث باسم العميل أو رقم الشيك<input id="statementSearch" type="search" placeholder="اسم العميل أو رقم الشيك…" oninput="renderStatements()"></label><label>القائمة<select id="statementSide" onchange="renderStatements()"><option value="all">لنا وعلينا</option><option value="us">لنا</option><option value="them">علينا</option></select></label></div><p id="statementSummary" class="muted"></p><h3>كشوف الحساب</h3><div class="scroll"><table><thead><tr><th>العميل</th><th>القائمة</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الكشف</th></tr></thead><tbody id="statementAccounts"></tbody></table></div><h3>سجل الدفعات</h3><div class="scroll"><table><thead><tr><th>التاريخ</th><th>العميل</th><th>القائمة</th><th>الدفعة</th><th>نوع الدفعة</th><th>رقم الشيك</th><th>الصنف</th><th>البيان</th><th>التفاصيل</th></tr></thead><tbody id="statementPayments"></tbody></table></div></dialog><dialog id="trashDialog"><button class="close" onclick="document.getElementById('trashDialog').close()">✕</button><h2>سلة المحذوفات</h2><p class="muted">تُحفظ هنا الحسابات المحذوفة مع جميع الحركات والدفعات والشيكات. استعادتها تعيدها إلى قائمتها الأصلية.</p><div class="row"><label>البحث باسم العميل أو رقم الشيك<input id="trashSearch" type="search" oninput="renderTrash()" placeholder="اسم العميل أو رقم الشيك…"></label><label>القائمة<select id="trashSide" onchange="renderTrash()"><option value="all">لنا وعلينا</option><option value="us">لنا</option><option value="them">علينا</option></select></label></div><p id="trashSummary" class="muted"></p><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>القائمة</th><th>تاريخ الحذف</th><th>الحركات</th><th>الدفعات</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="trashRows"></tbody></table></div><div class="account-danger"><button id="emptyTrash" class="delete-account" onclick="emptyTrash()">إفراغ سلة المحذوفات نهائيًا</button></div></dialog><dialog id="whatsappDialog"><button class="close" onclick="document.getElementById('whatsappDialog').close()">✕</button><h2>إرسال كشف الحساب عبر واتساب</h2><p id="whatsappRecipient" class="muted"></p><div class="share-step"><b>1. احفظ كشف الحساب PDF</b><p>اضغط الزر واختر «حفظ كملف PDF» من نافذة الطباعة.</p><button class="primary" onclick="printWhatsAppStatement()">حفظ الكشف PDF</button></div><div class="share-step"><b>2. افتح محادثة العميل وأرفق الملف</b><p>اضغط فتح واتساب، ثم أرفق ملف PDF الذي حفظته وأرسله. تظهر رسالة جاهزة بملخص الرصيد.</p><a id="whatsappLink" class="whatsapp-link" target="_blank" rel="noopener noreferrer">فتح واتساب</a></div><p class="muted">لن يُرسل الكشف تلقائيًا؛ الإرفاق والإرسال يتمان داخل واتساب.</p></dialog><dialog id="detail"></dialog><dialog id="payment"><button class="close" onclick="payment.close()">✕</button><h2 id="paymentTitle">تسجيل دفعة</h2><p id="remaining"></p><form id="payForm"><label>مبلغ الدفعة بالشيكل<input name="amount" type="number" min="0.01" step="0.01" required></label><label>تاريخ الدفع<input name="date" type="date" required></label><label>نوع الدفعة<select name="method" id="paymentMethod" onchange="toggleChequeField()" required><option value="" disabled>اختر نوع الدفعة</option><option value="cash">نقدي</option><option value="transfer">تحويل</option><option value="cheque">شيك</option></select></label><label id="chequeField" hidden>رقم الشيك<input name="chequeNumber" id="chequeNumber" type="text" maxlength="100" placeholder="أدخل رقم الشيك" disabled></label><label>ملاحظات<input name="note" maxlength="200" placeholder="ملاحظات إضافية (اختياري)"></label><button class="primary" id="savePayment">حفظ الدفعة</button></form></dialog><div id="toast"></div><section id="print"></section><script>
 const KEY='alreem-test-ledger-v2';let accounts=[],trash=[],side='us',selected=null;const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),money=n=>(n/100).toLocaleString('ar',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₪',cents=n=>Math.round(Number(n)*100),today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Hebron'}),paid=a=>a.payments.reduce((s,p)=>s+p.amount,0),left=a=>a.amount-paid(a);
 try{const saved=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(saved))accounts=saved;else if(saved&&Array.isArray(saved.accounts)&&Array.isArray(saved.trash)){accounts=saved.accounts;trash=saved.trash}else throw Error('invalid storage')}catch{alert('تعذرت قراءة البيانات المحفوظة. لا تضف حسابات قبل استعادة نسخة سليمة.');document.querySelectorAll('button').forEach(b=>b.disabled=true)}
-function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',3000)}function commit(next,nextTrash=trash){try{next=normalizeAccounts(next);validateState(next,nextTrash);localStorage.setItem(KEY,JSON.stringify({version:2,accounts:next,trash:nextTrash}));accounts=next;trash=nextTrash;queueAutomaticBackup();render();$('trashCount').textContent=trash.length;if($('statements').open)renderStatements();if($('trashDialog').open)renderTrash();return true}catch(e){alert('تعذر الحفظ: '+(e.message||'تحقق من مساحة التخزين والسماح بالحفظ'));return false}}
+function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',3000)}function commitLocal(next,nextTrash=trash){try{next=normalizeAccounts(next);validateState(next,nextTrash);localStorage.setItem(KEY,JSON.stringify({version:2,accounts:next,trash:nextTrash}));accounts=next;trash=nextTrash;queueAutomaticBackup();render();$('trashCount').textContent=trash.length;if($('statements').open)renderStatements();if($('trashDialog').open)renderTrash();return true}catch(e){alert('تعذر الحفظ: '+(e.message||'تحقق من مساحة التخزين والسماح بالحفظ'));return false}}
 let editingId=null,fixedClientId=null;
 const normalizedName=s=>String(s).trim().replace(/\s+/g,' ').toLocaleLowerCase('ar');
 function normalizeAccounts(records){const names=new Map();for(const a of records)if(a.clientId)names.set(normalizedName(a.name),a.clientId);return records.map(a=>{const key=normalizedName(a.name);if(!names.has(key))names.set(key,a.id);return {...a,clientId:a.clientId||names.get(key)}}).map((a,_,all)=>({...a,phone:all.find(x=>x.clientId===a.clientId&&x.phone)?.phone||a.phone||''}))}
@@ -71,7 +86,7 @@ function prepareForm(){const form=$('accountForm');form.reset();for(const name o
 function newAccount(){editingId=null;fixedClientId=null;prepareForm();$('accountForm').elements.namedItem('side').value=side;$('entry').showModal()}
 function addForClient(id,which){const a=accounts.find(a=>a.id===id);if(!a)return;editingId=null;fixedClientId=a.clientId;prepareForm();const f=$('accountForm').elements;f.namedItem('name').value=a.name;f.namedItem('name').readOnly=true;f.namedItem('phone').value=a.phone?'+'+a.phone:'';f.namedItem('side').value=which;$('entryTitle').textContent='إضافة حركة '+(which==='us'?'لنا':'علينا');$('entryHint').textContent='ستُضاف الحركة إلى حساب '+a.name+' في قائمة '+(which==='us'?'لنا':'علينا')+'، دون تكرار اسم العميل.';$('accountSubmit').textContent='إضافة الحركة';$('entry').showModal()}
 function editAccount(id){const a=accounts.find(a=>a.id===id);if(!a)return;editingId=id;fixedClientId=a.clientId;prepareForm();const f=$('accountForm').elements;for(const field of ['name','item','amount','side','date','notes','phone'])f.namedItem(field).value=field==='amount'?(a.amount/100).toFixed(2):a[field]||'';f.namedItem('side').disabled=true;$('entryTitle').textContent='تعديل الحركة';$('entryHint').textContent='تعديل الاسم ورقم الهاتف يحدّث بيانات العميل في القائمتين. مبلغ الحركة لا يمكن أن يقل عن دفعاتها ('+money(paid(a))+'). تبقى الحركة في قائمتها الحالية.';$('accountSubmit').textContent='حفظ التعديل';$('entry').showModal()}
-$('accountForm').onsubmit=e=>{e.preventDefault();const f=e.target.elements,name=f.namedItem('name').value.trim(),item=f.namedItem('item').value.trim(),amount=cents(f.namedItem('amount').value),which=f.namedItem('side').value,date=f.namedItem('date').value,notes=f.namedItem('notes').value.trim(),phone=normalizePhone(f.namedItem('phone').value);if(phone===null){alert('أدخل رقم هاتف صحيحًا مع رمز الدولة، أو اترك الحقل فارغًا.');return}if(!name||!item||!Number.isSafeInteger(amount)||amount<=0)return;let next,id;if(editingId){const original=accounts.find(a=>a.id===editingId);if(!original)return;if(original.side==='them'&&amount<paid(original)){alert('لا يمكن تقليل مبلغ الحركة إلى أقل من مجموع دفعاتها: '+money(paid(original)));return}if(accounts.some(a=>a.clientId!==original.clientId&&normalizedName(a.name)===normalizedName(name))){alert('الاسم موجود لعميل آخر. استخدم اسمًا مميزًا لتجنب دمج حسابين مختلفين.');return}id=original.id;next=accounts.map(a=>a.clientId===original.clientId?{...a,name,phone,...(a.id===id?{item,amount,date,notes}:{})}:a)}else{const existing=accounts.find(a=>fixedClientId?a.clientId===fixedClientId:normalizedName(a.name)===normalizedName(name)),clientId=existing?.clientId||crypto.randomUUID();id=crypto.randomUUID();next=[...accounts.map(a=>a.clientId===clientId&&phone?{...a,phone}:a),{id,clientId,phone:phone||existing?.phone||'',name:existing?.name||name,item,amount,side:which,date,notes,payments:[]}]}if(commit(next)){$('entry').close();side=which;if(!editingId)statusFilters[which]='unpaid';render();if($('detail').open)show(id);toast(editingId?'تم حفظ التعديل':'تمت إضافة الحركة إلى حساب العميل');editingId=null;fixedClientId=null}};
+$('accountForm').onsubmit=async e=>{e.preventDefault();const f=e.target.elements,name=f.namedItem('name').value.trim(),item=f.namedItem('item').value.trim(),amount=cents(f.namedItem('amount').value),which=f.namedItem('side').value,date=f.namedItem('date').value,notes=f.namedItem('notes').value.trim(),phone=normalizePhone(f.namedItem('phone').value);if(phone===null){alert('أدخل رقم هاتف صحيحًا مع رمز الدولة، أو اترك الحقل فارغًا.');return}if(!name||!item||!Number.isSafeInteger(amount)||amount<=0)return;let next,id;if(editingId){const original=accounts.find(a=>a.id===editingId);if(!original)return;if(original.side==='them'&&amount<paid(original)){alert('لا يمكن تقليل مبلغ الحركة إلى أقل من مجموع دفعاتها: '+money(paid(original)));return}if(accounts.some(a=>a.clientId!==original.clientId&&normalizedName(a.name)===normalizedName(name))){alert('الاسم موجود لعميل آخر. استخدم اسمًا مميزًا لتجنب دمج حسابين مختلفين.');return}id=original.id;next=accounts.map(a=>a.clientId===original.clientId?{...a,name,phone,...(a.id===id?{item,amount,date,notes}:{})}:a)}else{const existing=accounts.find(a=>fixedClientId?a.clientId===fixedClientId:normalizedName(a.name)===normalizedName(name)),clientId=existing?.clientId||crypto.randomUUID();id=crypto.randomUUID();next=[...accounts.map(a=>a.clientId===clientId&&phone?{...a,phone}:a),{id,clientId,phone:phone||existing?.phone||'',name:existing?.name||name,item,amount,side:which,date,notes,payments:[]}]}if(await commit(next)){$('entry').close();side=which;if(!editingId)statusFilters[which]='unpaid';render();if($('detail').open)show(id);toast(editingId?'تم حفظ التعديل':'تمت إضافة الحركة إلى حساب العميل');editingId=null;fixedClientId=null}};
 function statementBalance(balance, side) {
   const formatted = money(balance);
   return side === 'us' && balance < 0 ? formatted + ' (لصالح الزبون)' : formatted;
@@ -89,8 +104,8 @@ function preparePayment(a,r=null){const base=paymentBase(r),rows=base.filter(x=>
 function addPayment(id){const a=accounts.find(a=>a.id===id);if(a)preparePayment(a)}
 function editPayment(key){const r=findReceipt(key);if(r)preparePayment(r.account,r)}
 function refreshPaymentViews(anchor){if($('detail').open)show(anchor);if($('statements').open)renderStatements()}
-function deletePayment(key){const r=findReceipt(key);if(!r)return;const info=r.method==='cheque'?'الشيك رقم '+r.chequeNumber:'الدفعة';if(!confirm('حذف '+info+' بقيمة '+money(r.amount)+' من حساب '+r.account.name+' ('+(r.account.side==='us'?'لنا':'علينا')+')؟\nسيُعاد احتساب المدفوع والمتبقي.'))return;if(commit(paymentBase(r))){refreshPaymentViews(r.account.id);toast('تم حذف الدفعة وتحديث الرصيد')}}
-$('payForm').onsubmit=e=>{e.preventDefault();if(!paymentSession||paymentBusy)return;const session=paymentSession,a=accounts.find(a=>a.id===session.accountId);if(!a)return;const original=session.editKey?findReceipt(session.editKey):null;if(session.editKey&&!original){alert('هذه الدفعة لم تعد موجودة. أغلق النافذة وأعد فتحها.');return}const f=e.target.elements,n=cents(f.namedItem('amount').value),method=f.namedItem('method').value,chequeNumber=method==='cheque'?f.namedItem('chequeNumber').value.trim():'',date=f.namedItem('date').value,note=f.namedItem('note').value.trim();if(!['cash','transfer','cheque'].includes(method)){alert('اختر نوع الدفعة.');return}if(method==='cheque'&&!chequeNumber){alert('أدخل رقم الشيك.');return}const base=paymentBase(original),rows=base.filter(x=>x.clientId===a.clientId&&x.side===a.side).slice().sort((x,y)=>x.date.localeCompare(y.date));if(!Number.isSafeInteger(n)||n<=0){alert('أدخل مبلغ دفعة صحيحًا أكبر من صفر.');return}if(a.side==='them'&&n>totals(rows).left){alert('لا يمكن أن تتجاوز الدفعة المتبقي في قائمة علينا.');return}if(method==='cheque'&&receiptsFor(base.filter(x=>x.clientId===a.clientId&&x.side===a.side)).some(p=>p.method==='cheque'&&String(p.chequeNumber).trim()===chequeNumber)){alert('رقم الشيك مسجل مسبقًا لهذا العميل في هذه القائمة. عدّل الدفعة المسجلة بدل إضافتها مرة أخرى.');return}paymentBusy=true;$('savePayment').disabled=true;try{const receiptId=original?.receiptId||crypto.randomUUID();let remaining=n;const changed=new Map();for(const row of rows){const part=Math.min(remaining,left(row));if(part>0){changed.set(row.id,{...row,payments:[...row.payments,{id:crypto.randomUUID(),receiptId,amount:part,date,note,method,chequeNumber}]});remaining-=part}if(!remaining)break}
+async function deletePayment(key){const r=findReceipt(key);if(!r)return;const info=r.method==='cheque'?'الشيك رقم '+r.chequeNumber:'الدفعة';if(!confirm('حذف '+info+' بقيمة '+money(r.amount)+' من حساب '+r.account.name+' ('+(r.account.side==='us'?'لنا':'علينا')+')؟\nسيُعاد احتساب المدفوع والمتبقي.'))return;if(await commit(paymentBase(r))){refreshPaymentViews(r.account.id);toast('تم حذف الدفعة وتحديث الرصيد')}}
+$('payForm').onsubmit=async e=>{e.preventDefault();if(!paymentSession||paymentBusy)return;const session=paymentSession,a=accounts.find(a=>a.id===session.accountId);if(!a)return;const original=session.editKey?findReceipt(session.editKey):null;if(session.editKey&&!original){alert('هذه الدفعة لم تعد موجودة. أغلق النافذة وأعد فتحها.');return}const f=e.target.elements,n=cents(f.namedItem('amount').value),method=f.namedItem('method').value,chequeNumber=method==='cheque'?f.namedItem('chequeNumber').value.trim():'',date=f.namedItem('date').value,note=f.namedItem('note').value.trim();if(!['cash','transfer','cheque'].includes(method)){alert('اختر نوع الدفعة.');return}if(method==='cheque'&&!chequeNumber){alert('أدخل رقم الشيك.');return}const base=paymentBase(original),rows=base.filter(x=>x.clientId===a.clientId&&x.side===a.side).slice().sort((x,y)=>x.date.localeCompare(y.date));if(!Number.isSafeInteger(n)||n<=0){alert('أدخل مبلغ دفعة صحيحًا أكبر من صفر.');return}if(a.side==='them'&&n>totals(rows).left){alert('لا يمكن أن تتجاوز الدفعة المتبقي في قائمة علينا.');return}if(method==='cheque'&&receiptsFor(base.filter(x=>x.clientId===a.clientId&&x.side===a.side)).some(p=>p.method==='cheque'&&String(p.chequeNumber).trim()===chequeNumber)){alert('رقم الشيك مسجل مسبقًا لهذا العميل في هذه القائمة. عدّل الدفعة المسجلة بدل إضافتها مرة أخرى.');return}paymentBusy=true;$('savePayment').disabled=true;try{const receiptId=original?.receiptId||crypto.randomUUID();let remaining=n;const changed=new Map();for(const row of rows){const part=Math.min(remaining,left(row));if(part>0){changed.set(row.id,{...row,payments:[...row.payments,{id:crypto.randomUUID(),receiptId,amount:part,date,note,method,chequeNumber}]});remaining-=part}if(!remaining)break}
 if(remaining>0&&a.side==='us'){
   const anchor=changed.get(a.id)||base.find(row=>row.id===a.id);
   const existing=changed.has(a.id)?anchor.payments[anchor.payments.length-1]:null;
@@ -99,7 +114,7 @@ if(remaining>0&&a.side==='us'){
     : [...anchor.payments,{id:crypto.randomUUID(),receiptId,amount:remaining,date,note,method,chequeNumber}];
   changed.set(a.id,{...anchor,payments});
 }
-if(commit(base.map(x=>changed.get(x.id)||x))){paymentSession=null;$('payment').close();if(side==='us'&&a.side==='us'&&totals(clientRows(a)).left<0&&statusFilters.us==='unpaid'){statusFilters.us='all';render()}
+if(await commit(base.map(x=>changed.get(x.id)||x))){paymentSession=null;$('payment').close();if(side==='us'&&a.side==='us'&&totals(clientRows(a)).left<0&&statusFilters.us==='unpaid'){statusFilters.us='all';render()}
 refreshPaymentViews(a.id);toast(original?'تم تعديل الدفعة وتحديث الرصيد':'تم حفظ الدفعة مرة واحدة')}}finally{paymentBusy=false;$('savePayment').disabled=false}};
 
 function filterClientCheques(){const a=accounts.find(a=>a.id===selected);if(a)$('clientPaymentList').innerHTML=clientPayments(clientRows(a),true,$('detailChequeSearch').value)}
@@ -151,7 +166,7 @@ function restoreStatus(message,isError=false){$('restoreStatus').textContent=mes
 function cancelRestore(){restoreToken++;pendingRestore=null;restoreBusy=false;$('restore').value='';$('restoreDialog').close();$('exporting').textContent=''}
 function readBackupFile(file){return new Promise((resolve,reject)=>{const reader=new FileReader();let settled=false;const finish=(error,result)=>{if(settled)return;settled=true;clearTimeout(timer);error?reject(error):resolve(result)};const timer=setTimeout(()=>{finish(Error('تأخرت قراءة الملف. افتح تطبيق الملفات ونزّل النسخة على الآيفون أولًا، ثم اخترها مجددًا.'));reader.abort()},45000);reader.onload=()=>finish(null,reader.result);reader.onerror=()=>finish(Error('تعذرت قراءة الملف من الهاتف. نزّله من iCloud إلى «على الـ iPhone» ثم أعد المحاولة.'));reader.onabort=()=>finish(Error('تم إلغاء قراءة الملف'));try{reader.readAsArrayBuffer(file)}catch(e){finish(e)}})}
 async function restoreFile(input){if(restoreBusy)return;const file=input.files&&input.files[0];if(!file)return;const token=++restoreToken;restoreBusy=true;pendingRestore=null;$('restoreApply').hidden=true;$('restoreFilename').textContent=file.name;$('restoreSummary').textContent='';restoreStatus('جارٍ قراءة النسخة…');if(!$('restoreDialog').open)$('restoreDialog').showModal();$('exporting').textContent='جارٍ قراءة الملف…';try{if(!file.size)throw Error('الملف فارغ أو لم يكتمل تنزيله من iCloud. نزّله على الهاتف ثم أعد اختياره.');if(file.size>20000000)throw Error('الحد الأقصى للملف 20 ميجابايت');let buffer=await readBackupFile(file);if(token!==restoreToken)return;if(isEncryptedBackup(buffer)){restoreStatus('جارٍ فك تشفير النسخة…');buffer=await decryptBackup(buffer);if(token!==restoreToken)return}const bytes=new Uint8Array(buffer);let next;if(bytes[0]===0x50&&bytes[1]===0x4b){restoreStatus('جارٍ التحقق من حسابات ملف Excel…');next=await readExcel(buffer)}else{let data;try{data=JSON.parse(new TextDecoder('utf-8').decode(bytes).replace(/^\uFEFF/,''))}catch{throw Error('هذه ليست نسخة Excel أو JSON صالحة. اختر ملف النسخة الاحتياطية الأصلي، وليس PDF أو صورة.')}if(data.version!==1&&data.version!==2)throw Error('صيغة النسخة غير مدعومة');if(!Array.isArray(data.accounts))throw Error('بيانات الحسابات غير موجودة');next={accounts:validateRecords(data.accounts.map(a=>({...a,notes:a.notes||''}))),trash:validateTrash(data.trash||[])}}if(token!==restoreToken)return;validateState(next.accounts,next.trash);pendingRestore=next;const payments=receiptsFor(next.accounts).length;$('restoreSummary').textContent=next.accounts.length+' حركة حساب نشطة · '+payments+' دفعة · '+next.trash.length+' حساب في السلة';restoreStatus('النسخة جاهزة. اضغط «استعادة البيانات» لإتمام الاستيراد.');$('restoreApply').hidden=false}catch(e){if(token===restoreToken)restoreStatus('لم يتم الاستيراد: '+(e.message||'تعذرت قراءة النسخة')+' لم تتغير حساباتك الحالية.',true)}finally{if(token===restoreToken){restoreBusy=false;input.value='';$('exporting').textContent=''}}}
-function applyRestore(){if(!pendingRestore||restoreBusy)return;const next=pendingRestore;if(commit(next.accounts,next.trash)){pendingRestore=null;side='us';statusFilters.us='all';statusFilters.them='all';$('search').value='';render();$('restoreDialog').close();toast('تمت استعادة الحسابات والدفعات بنجاح')}else restoreStatus('تعذر حفظ النسخة في هذا المتصفح. لم تكتمل الاستعادة؛ تحقق من مساحة التخزين وحاول مجددًا.',true)}
+async function applyRestore(){if(!pendingRestore||restoreBusy)return;const next=pendingRestore;if(await commit(next.accounts,next.trash)){pendingRestore=null;side='us';statusFilters.us='all';statusFilters.them='all';$('search').value='';render();$('restoreDialog').close();toast('تمت استعادة الحسابات والدفعات بنجاح')}else restoreStatus('تعذر حفظ النسخة في هذا المتصفح. لم تكتمل الاستعادة؛ تحقق من مساحة التخزين وحاول مجددًا.',true)}
 
 try{const stamp=localStorage.getItem(KEY+'-export');if(stamp)$('backupDate').textContent='آخر تصدير: '+stamp}catch{}
 
@@ -169,7 +184,7 @@ function validateState(next,nextTrash){validateRecords(next);validateTrash(nextT
 function trashSummary(item){const a=item.records[0];return {name:a.name,side:a.side,...totals(item.records),payments:receiptsFor(item.records).length}}
 function openTrash(){$('trashSearch').value='';$('trashSide').value='all';renderTrash();$('trashDialog').showModal()}
 function renderTrash(){const q=normalizedSearch($('trashSearch').value),filter=$('trashSide').value;const rows=trash.filter(item=>(filter==='all'||item.records[0].side===filter)&&matchesAccountSearch(item.records,q)).slice().sort((a,b)=>b.deletedAt.localeCompare(a.deletedAt));$('trashCount').textContent=trash.length;$('trashSummary').textContent=rows.length+' حساب محذوف · لا تدخل المحذوفات في الأرصدة الحالية';$('emptyTrash').disabled=trash.length===0;$('trashRows').innerHTML=rows.length?rows.map(item=>{const t=trashSummary(item);return `<tr><td>${esc(t.name)}</td><td>${t.side==='us'?'لنا':'علينا'}</td><td>${esc(new Date(item.deletedAt).toLocaleString('ar-PS'))}</td><td>${item.records.length}</td><td>${t.payments}</td><td>${money(t.left)}</td><td class="trash-actions"><button onclick="restoreAccount('${item.id}')">استعادة</button><button class="delete-account" onclick="purgeAccount('${item.id}')">حذف نهائي</button></td></tr>`}).join(''):'<tr><td colspan="7" class="empty">لا توجد حسابات محذوفة مطابقة.</td></tr>'}
-function deleteMovement(id) {
+async function deleteMovement(id) {
   const movement = accounts.find(account => account.id === id);
   if (!movement) return;
 
@@ -183,7 +198,7 @@ function deleteMovement(id) {
     deletedAt: new Date().toISOString(),
     records: [movement]
   };
-  if (!commit(accounts.filter(account => account.id !== id), [...trash, item])) return;
+  if (!await commit(accounts.filter(account => account.id !== id), [...trash, item])) return;
 
   if (paymentSession && paymentSession.accountId === id) {
     paymentSession = null;
@@ -198,10 +213,10 @@ function deleteMovement(id) {
   }
   toast('تم نقل الحركة إلى سلة المحذوفات');
 }
-function deleteAccount(id){const a=accounts.find(x=>x.id===id);if(!a)return;const rows=clientRows(a),ids=new Set(rows.map(x=>x.id)),list=a.side==='us'?'لنا':'علينا';if(!confirm('نقل حساب '+a.name+' من قائمة «'+list+'» إلى سلة المحذوفات؟\nسيُحفظ معه '+rows.length+' حركة و'+receiptsFor(rows).length+' دفعة، ويمكن استعادته لاحقًا.\nلن يتأثر حساب العميل في القائمة الأخرى.'))return;const item={id:crypto.randomUUID(),deletedAt:new Date().toISOString(),records:JSON.parse(JSON.stringify(rows))};if(commit(accounts.filter(x=>!ids.has(x.id)),[...trash,item])){if(ids.has(selected)){$('detail').close();selected=null}if(paymentSession&&ids.has(paymentSession.accountId)){paymentSession=null;$('payment').close()}toast('تم نقل الحساب إلى سلة المحذوفات')}}
-function restoreAccount(id){const item=trash.find(x=>x.id===id);if(!item)return;const a=item.records[0],existing=accounts.find(x=>x.clientId===a.clientId)||accounts.find(x=>normalizedName(x.name)===normalizedName(a.name));const restored=item.records.map(x=>existing?{...x,clientId:existing.clientId,name:existing.name,phone:existing.phone||x.phone||''}:{...x});try{validateState([...accounts,...restored],trash.filter(x=>x.id!==id))}catch(e){alert('تعذرت الاستعادة: '+e.message+'. لم تتغير بياناتك.');return}if(commit([...accounts,...restored],trash.filter(x=>x.id!==id))){side=a.side;statusFilters[side]='all';$('search').value='';render();toast('تمت استعادة الحساب بكامل حركاته ودفعاته')}}
-function purgeAccount(id){const item=trash.find(x=>x.id===id);if(!item)return;const t=trashSummary(item);if(!confirm('حذف حساب '+t.name+' ('+(t.side==='us'?'لنا':'علينا')+') من السلة نهائيًا؟\nسيُحذف معه '+item.records.length+' حركة و'+t.payments+' دفعة. لا يمكن استعادته من السلة بعد ذلك.'))return;if(commit(accounts,trash.filter(x=>x.id!==id)))toast('تم الحذف النهائي من السلة')}
-function emptyTrash(){if(!trash.length)return;if(!confirm('إفراغ سلة المحذوفات نهائيًا؟\nسيتم حذف '+trash.length+' حساب محذوف بكامل حركاته ودفعاته. لا يمكن التراجع من داخل البرنامج.\nالحسابات النشطة لن تتأثر.'))return;if(commit(accounts,[]))toast('تم إفراغ سلة المحذوفات')}
+async function deleteAccount(id){const a=accounts.find(x=>x.id===id);if(!a)return;const rows=clientRows(a),ids=new Set(rows.map(x=>x.id)),list=a.side==='us'?'لنا':'علينا';if(!confirm('نقل حساب '+a.name+' من قائمة «'+list+'» إلى سلة المحذوفات؟\nسيُحفظ معه '+rows.length+' حركة و'+receiptsFor(rows).length+' دفعة، ويمكن استعادته لاحقًا.\nلن يتأثر حساب العميل في القائمة الأخرى.'))return;const item={id:crypto.randomUUID(),deletedAt:new Date().toISOString(),records:JSON.parse(JSON.stringify(rows))};if(await commit(accounts.filter(x=>!ids.has(x.id)),[...trash,item])){if(ids.has(selected)){$('detail').close();selected=null}if(paymentSession&&ids.has(paymentSession.accountId)){paymentSession=null;$('payment').close()}toast('تم نقل الحساب إلى سلة المحذوفات')}}
+async function restoreAccount(id){const item=trash.find(x=>x.id===id);if(!item)return;const a=item.records[0],existing=accounts.find(x=>x.clientId===a.clientId)||accounts.find(x=>normalizedName(x.name)===normalizedName(a.name));const restored=item.records.map(x=>existing?{...x,clientId:existing.clientId,name:existing.name,phone:existing.phone||x.phone||''}:{...x});try{validateState([...accounts,...restored],trash.filter(x=>x.id!==id))}catch(e){alert('تعذرت الاستعادة: '+e.message+'. لم تتغير بياناتك.');return}if(await commit([...accounts,...restored],trash.filter(x=>x.id!==id))){side=a.side;statusFilters[side]='all';$('search').value='';render();toast('تمت استعادة الحساب بكامل حركاته ودفعاته')}}
+async function purgeAccount(id){const item=trash.find(x=>x.id===id);if(!item)return;const t=trashSummary(item);if(!confirm('حذف حساب '+t.name+' ('+(t.side==='us'?'لنا':'علينا')+') من السلة نهائيًا؟\nسيُحذف معه '+item.records.length+' حركة و'+t.payments+' دفعة. لا يمكن استعادته من السلة بعد ذلك.'))return;if(await commit(accounts,trash.filter(x=>x.id!==id)))toast('تم الحذف النهائي من السلة')}
+async function emptyTrash(){if(!trash.length)return;if(!confirm('إفراغ سلة المحذوفات نهائيًا؟\nسيتم حذف '+trash.length+' حساب محذوف بكامل حركاته ودفعاته. لا يمكن التراجع من داخل البرنامج.\nالحسابات النشطة لن تتأثر.'))return;if(await commit(accounts,[]))toast('تم إفراغ سلة المحذوفات')}
 
 function normalizePhone(value){const raw=normalizedSearch(value).replace(/[\s().-]/g,'');if(!raw)return '';if(!/^(\+|00)?\d+$/.test(raw))return null;let digits=raw.replace(/^\+/,'').replace(/^00/,'');if(/^05\d{8}$/.test(digits))digits='970'+digits.slice(1);return /^[1-9]\d{8,14}$/.test(digits)?digits:null}
 function fillExistingPhone(){const f=$('accountForm').elements,a=accounts.find(a=>normalizedName(a.name)===normalizedName(f.namedItem('name').value));if(a)f.namedItem('phone').value=a.phone?'+'+a.phone:''}
@@ -443,7 +458,10 @@ $('loginForm').onsubmit = async event => {
   }
 };
 
-function signOut() {
+async function signOut() {
+  if (cloudBusy) return;
+  if (cloudSession) await disconnectCloud();
+  if (cloudSession) return;
   backupCredentials = null;
   $('settingsDialog').close();
   requireLocalLogin();
@@ -491,9 +509,217 @@ async function decryptBackup(buffer) {
   }
 }
 
+const syncConfig = {
+  apiKey: 'AIzaSyAV9fbDoZABmkFo1g4yo8aTTlHpzCs1KTk',
+  authDomain: 'alreem-carpentry-sync.firebaseapp.com',
+  projectId: 'alreem-carpentry-sync',
+  appId: '1:411085584112:web:e086084b0c31b58bb3b435'
+};
+let firebaseSync;
+let cloudSession;
+let cloudBusy = false;
+let cloudMessage = 'الحفظ على هذا الجهاز';
+
+async function loadSync() {
+  if (firebaseSync) return firebaseSync;
+  const version = '12.5.0';
+  const url = 'https://www.gstatic.com/firebasejs/' + version + '/firebase-';
+  const [core, auth, db] = await Promise.all([
+    import(url + 'app.js'), import(url + 'auth.js'), import(url + 'firestore.js')
+  ]);
+  const app = core.getApps()[0] || core.initializeApp(syncConfig);
+  const authentication = auth.getAuth(app);
+  await auth.setPersistence(authentication, auth.inMemoryPersistence);
+  firebaseSync = {auth, db, authentication, firestore:db.getFirestore(app)};
+  return firebaseSync;
+}
+
+function syncStatus(message) {
+  cloudMessage = message;
+  $('syncState').textContent = message;
+  $('syncFeedback').textContent = message;
+}
+
+function cloudPayload(records, deleted) {
+  const payload = JSON.stringify({version:2,accounts:records,trash:deleted});
+  if (new TextEncoder().encode(payload).length > 950000) {
+    throw Error('تجاوز حجم الحسابات حد النسخة التجريبية للمزامنة. صدّر نسخة احتياطية.');
+  }
+  return payload;
+}
+
+function readCloud(snapshot) {
+  const {revision, payload} = snapshot.data();
+  if (!Number.isSafeInteger(revision) || revision < 1) throw Error('إصدار السجل غير صالح.');
+  const data = JSON.parse(payload);
+  if (data.version !== 2) throw Error('صيغة السجل غير مدعومة.');
+  const records = normalizeAccounts(data.accounts);
+  validateState(records, data.trash);
+  return {revision, accounts:records, trash:data.trash};
+}
+
+function updateCloudViews(data) {
+  accounts = data.accounts;
+  trash = data.trash;
+  render();
+  $('trashCount').textContent = trash.length;
+  if ($('statements').open) renderStatements();
+  if ($('trashDialog').open) renderTrash();
+  if ($('detail').open) {
+    if (accounts.some(row => row.id === selected)) show(selected);
+    else $('detail').close();
+  }
+}
+
+function applyCloud(session, data) {
+  if (cloudSession !== session || data.revision <= session.revision) return;
+  if (session.revision && !cloudBusy) {
+    if ($('entry').open) $('entry').close();
+    if ($('payment').open) { $('payment').close(); paymentSession = null; }
+    if ($('restoreDialog').open) cancelRestore();
+  }
+  session.revision = data.revision;
+  updateCloudViews(data);
+}
+
+function syncDialogState() {
+  $('syncAuthForm').hidden = !!cloudSession;
+  $('disconnectSync').hidden = !cloudSession;
+  $('syncFeedback').textContent = cloudMessage;
+}
+
+function showSyncSettings() {
+  syncDialogState();
+  $('syncDialog').showModal();
+}
+
+function syncError(error) {
+  if (error.code === 'permission-denied') return 'رفض Firebase الوصول إلى سجل الحساب. تحقّق من قواعد Firestore.';
+  if (error.code === 'auth/email-already-in-use') return 'هذا البريد مسجّل. اختر تسجيل الدخول.';
+  if (error.code?.startsWith('auth/')) return 'تعذّر الدخول. تحقّق من البريد وكلمة المرور والاتصال.';
+  if (error.code === 'unavailable') return 'الاتصال بالمزامنة غير متاح الآن. حاول مرة أخرى بعد عودة الاتصال.';
+  return error.message || 'تعذّر الاتصال بالمزامنة.';
+}
+
+$('syncAuthForm').onsubmit = async event => {
+  event.preventDefault();
+  if (cloudBusy || cloudSession) return;
+  cloudBusy = true;
+  const email = $('syncEmail').value.trim();
+  const password = $('syncPassword').value;
+  const create = event.submitter?.value === 'create';
+  const copyLocal = $('syncCopyLocal').checked;
+  let sdk;
+  try {
+    syncStatus('جارٍ الاتصال بـ Firebase…');
+    sdk = await loadSync();
+    const method = create ? sdk.auth.createUserWithEmailAndPassword : sdk.auth.signInWithEmailAndPassword;
+    const {user} = await method(sdk.authentication,email,password);
+    const ref = sdk.db.doc(sdk.firestore,'testLedgers',user.uid);
+    const first = await sdk.db.runTransaction(sdk.firestore, async transaction => {
+      const snapshot = await transaction.get(ref);
+      if (snapshot.exists()) return readCloud(snapshot);
+      const initial = {revision:1,accounts:copyLocal ? accounts : [],trash:copyLocal ? trash : []};
+      transaction.set(ref,{revision:1,payload:cloudPayload(initial.accounts,initial.trash)});
+      return initial;
+    });
+    const session = {ref, revision:0, localAccounts:accounts, localTrash:trash, unsubscribe:null};
+    cloudSession = session;
+    applyCloud(session,first);
+    session.unsubscribe = sdk.db.onSnapshot(ref,{includeMetadataChanges:true}, snapshot => {
+      if (cloudSession !== session || snapshot.metadata.hasPendingWrites) return;
+      if (snapshot.metadata.fromCache) {
+        syncStatus('المزامنة تنتظر الاتصال');
+        return;
+      }
+      if (!snapshot.exists()) {
+        syncStatus('تعذّر العثور على سجل المزامنة.');
+        return;
+      }
+      try {
+        const next = readCloud(snapshot);
+        // A save in progress will reconcile its server revision before rendering.
+        if (cloudBusy) session.pending = next;
+        else applyCloud(session,next);
+        syncStatus('متصل · ' + user.email);
+      } catch (error) {
+        syncStatus(syncError(error));
+      }
+    }, error => syncStatus(syncError(error)));
+    $('syncAuthForm').reset();
+    syncStatus('متصل · ' + user.email);
+    syncDialogState();
+    $('syncDialog').close();
+  } catch (error) {
+    if (sdk && !cloudSession) await sdk.auth.signOut(sdk.authentication).catch(() => {});
+    syncStatus(syncError(error));
+  } finally {
+    $('syncPassword').value = '';
+    cloudBusy = false;
+  }
+};
+
+async function disconnectCloud() {
+  const session = cloudSession;
+  if (!session || cloudBusy) return;
+  cloudBusy = true;
+  try {
+    await firebaseSync.auth.signOut(firebaseSync.authentication);
+    session.unsubscribe?.();
+    cloudSession = null;
+    if ($('detail').open) $('detail').close();
+    if ($('payment').open) $('payment').close();
+    if ($('entry').open) $('entry').close();
+    updateCloudViews({accounts:session.localAccounts,trash:session.localTrash});
+    syncStatus('الحفظ على هذا الجهاز');
+    syncDialogState();
+  } catch (error) {
+    syncStatus(syncError(error));
+  } finally {
+    cloudBusy = false;
+  }
+}
+
+async function commit(next, nextTrash = trash) {
+  const session = cloudSession;
+  if (cloudBusy) {
+    alert('توجد عملية مزامنة جارية. حاول مرة أخرى بعد اكتمالها.');
+    return false;
+  }
+  if (!session) return commitLocal(next,nextTrash);
+  cloudBusy = true;
+  try {
+    next = normalizeAccounts(next);
+    validateState(next,nextTrash);
+    const payload = cloudPayload(next,nextTrash);
+    const revision = session.revision;
+    const {db,firestore} = firebaseSync;
+    await db.runTransaction(firestore, async transaction => {
+      const snapshot = await transaction.get(session.ref);
+      if (!snapshot.exists() || snapshot.data().revision !== revision) {
+        throw Error('تغيّر الحساب على جهاز آخر. راجع البيانات المحدّثة وأعد العملية.');
+      }
+      transaction.update(session.ref,{revision:revision + 1,payload});
+    });
+    applyCloud(session,{revision:revision+1,accounts:next,trash:nextTrash});
+    queueAutomaticBackup();
+    return true;
+  } catch (error) {
+    alert(syncError(error));
+    return false;
+  } finally {
+    cloudBusy = false;
+    if (session.pending) {
+      applyCloud(session,session.pending);
+      session.pending = null;
+    }
+  }
+}
+
 requireLocalLogin();
 
 </script></html>
+
 
 
 
