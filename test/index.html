@@ -16,7 +16,7 @@
 #trashDialog{width:min(1100px,96vw)}#trashDialog .row{margin:24px 0}.trash-actions{min-width:170px}.trash-actions button{margin:3px}#trashCount{background:#47685b;border-radius:12px;padding:2px 7px;margin-right:5px;font-size:11px}@media print{#trashDialog{display:none!important}}
 .whatsapp-button{color:#13744d;border-color:#b8ddc8;background:#f3fbf5}.whatsapp-button:hover{background:#e3f6e9}.phone-number{font-variant-numeric:tabular-nums;unicode-bidi:isolate}.share-step{border:1px solid #dce8dc;border-radius:12px;padding:20px;margin:18px 0}.share-step p{font-size:13px;line-height:1.9;color:#637765}.whatsapp-link{display:inline-block;background:#187a50;color:white;padding:12px 20px;border-radius:9px;text-decoration:none;cursor:pointer}#whatsappDialog{width:min(600px,94vw)}@media print{#whatsappDialog{display:none!important}}
 .account-actions .icon-action{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:9px;flex:0 0 42px}.icon-action svg{display:block;pointer-events:none}.icon-action:focus-visible{outline:3px solid #bd9663;outline-offset:2px}.preferences-dialog{width:min(530px,94vw)}.preferences-dialog form{display:grid;gap:9px}.preferences-dialog p{margin:4px 0;line-height:1.65}.preferences-dialog .row{margin-top:12px}#loginFeedback{color:#a42e2e}
-</style><header><div><span class="brand-icon">▥</span><h1>منجرة الريم</h1><small>إدارة الحسابات والدفعات</small></div><span class="testflag">نسخة تجريبية مستقلة</span><div class="navlabel">مساحة العمل</div><div class="navitem selected">▦ &nbsp; الحسابات</div><button class="navitem nav-secondary" onclick="openStatements()">↙ &nbsp; الدفعات وكشوف الحساب</button><button class="navitem nav-secondary" onclick="openTrash()">سلة المحذوفات <span id="trashCount">0</span></button><div class="sidebar-bottom">منجرة الريم<br>إدارة بسيطة. حسابات واضحة.<br><span style="color:#789e8b">الإصدار التجريبي 2.6.8</span></div><button class="navitem nav-secondary" onclick="openSettings()">⚙ الإعدادات</button></header><main><div class="pagebar"><span>مساحة العمل &nbsp; / &nbsp; <b>الحسابات</b></span><span class="account-label"><span class="avatar">ر</span> منجرة الريم</span></div><div class="top"><div><div class="eyebrow">الإدارة المالية</div><h2>حساباتك، بوضوح.</h2><small id="today"></small></div><button class="primary" onclick="newAccount()">＋ إضافة حساب</button></div><div class="cards"><div class="card">إجمالي المتبقي لنا<strong class="green" id="ours"></strong><span class="caption">أرصدة مستحقة للتحصيل</span></div><div class="card">إجمالي المتبقي علينا<strong class="red" id="theirs"></strong><span class="caption">التزامات مستحقة للدفع</span></div><div class="card">صافي الرصيد <span class="muted">(لنا − علينا)</span><strong id="net"></strong><span class="caption">الفرق بين حقوقك والتزاماتك</span></div></div><div class="section-title">سجل الحسابات <span class="counter" id="accountCount">0 حساب</span></div><div class="status-tabs" role="group" aria-label="حالة الحساب"><button id="status-unpaid" onclick="setStatusFilter('unpaid')">غير مسددة</button><button id="status-paid" onclick="setStatusFilter('paid')">مسددة</button><button id="status-all" onclick="setStatusFilter('all')">جميع الحسابات</button></div><p class="status-hint">الحسابات المسددة والأرصدة لصالح الزبون تظهر ضمن فلتر «مسددة». البحث يشمل القائمة والحالة المختارتين.</p><div class="toolbar"><div class="tabs"><button id="tab-us" class="active" onclick="switchTab('us')">لنا (حساب)</button><button id="tab-them" onclick="switchTab('them')">علينا (حساب)</button></div><input id="search" placeholder="البحث باسم العميل، الصنف أو رقم الشيك…" oninput="render()"><button onclick="backup()">تصدير Excel ↓</button><button onclick="document.getElementById('restore').click()">استيراد نسخة ↑</button><input type="file" id="restore" accept=".xlsx,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,application/octet-stream" tabindex="-1" style="position:fixed;left:-10000px;top:0;width:1px;min-width:0;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="restoreFile(this)"></div><div class="panel"><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>نوع الصنف</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="list"></tbody></table></div><div id="empty" class="empty"><span class="empty-icon">▤</span>دفترك جاهز لأول حساب<br><p class="muted">ابدأ بإضافة حسابك الأول، ثم سجّل دفعاته بسهولة.</p><button onclick="newAccount()">＋ إضافة حساب</button></div></div><p class="notice">هذه نسخة تجريبية مستقلة عن الصفحة الأساسية. البيانات تُحفظ تلقائيًا في هذا المتصفح ولا تتزامن بين الأجهزة. ملف Excel يشمل الحسابات والدفعات وسلة المحذوفات ويمكن استعادته هنا. النسخة غير مشفرة؛ احفظها في مكان آمن.</p><div class="backupbar"><span id="backupDate">لم تُصدّر نسخة احتياطية بعد</span><span>العملة: شيكل إسرائيلي · ₪ &nbsp; <span id="exporting"></span></span></div></main><dialog id="settingsDialog" class="preferences-dialog" aria-labelledby="settingsTitle">
+</style><header><div><span class="brand-icon">▥</span><h1>منجرة الريم</h1><small>إدارة الحسابات والدفعات</small></div><span class="testflag">نسخة تجريبية مستقلة</span><div class="navlabel">مساحة العمل</div><div class="navitem selected">▦ &nbsp; الحسابات</div><button class="navitem nav-secondary" onclick="openStatements()">↙ &nbsp; الدفعات وكشوف الحساب</button><button class="navitem nav-secondary" onclick="openTrash()">سلة المحذوفات <span id="trashCount">0</span></button><div class="sidebar-bottom">منجرة الريم<br>إدارة بسيطة. حسابات واضحة.<br><span style="color:#789e8b">الإصدار التجريبي 2.6.9</span></div><button class="navitem nav-secondary" onclick="openSettings()">⚙ الإعدادات</button></header><main><div class="pagebar"><span>مساحة العمل &nbsp; / &nbsp; <b>الحسابات</b></span><span class="account-label"><span class="avatar">ر</span> منجرة الريم</span></div><div class="top"><div><div class="eyebrow">الإدارة المالية</div><h2>حساباتك، بوضوح.</h2><small id="today"></small></div><button class="primary" onclick="newAccount()">＋ إضافة حساب</button></div><div class="cards"><div class="card">إجمالي المتبقي لنا<strong class="green" id="ours"></strong><span class="caption">أرصدة مستحقة للتحصيل</span></div><div class="card">إجمالي المتبقي علينا<strong class="red" id="theirs"></strong><span class="caption">التزامات مستحقة للدفع</span></div><div class="card">صافي الرصيد <span class="muted">(لنا − علينا)</span><strong id="net"></strong><span class="caption">الفرق بين حقوقك والتزاماتك</span></div></div><div class="section-title">سجل الحسابات <span class="counter" id="accountCount">0 حساب</span></div><div class="status-tabs" role="group" aria-label="حالة الحساب"><button id="status-unpaid" onclick="setStatusFilter('unpaid')">غير مسددة</button><button id="status-paid" onclick="setStatusFilter('paid')">مسددة</button><button id="status-all" onclick="setStatusFilter('all')">جميع الحسابات</button></div><p class="status-hint">الحسابات المسددة والأرصدة لصالح الزبون تظهر ضمن فلتر «مسددة». البحث يشمل القائمة والحالة المختارتين.</p><div class="toolbar"><div class="tabs"><button id="tab-us" class="active" onclick="switchTab('us')">لنا (حساب)</button><button id="tab-them" onclick="switchTab('them')">علينا (حساب)</button></div><input id="search" placeholder="البحث باسم العميل، الصنف أو رقم الشيك…" oninput="render()"><button onclick="backup()">تصدير نسخة مشفّرة ↓</button><button onclick="document.getElementById('restore').click()">استيراد نسخة ↑</button><input type="file" id="restore" accept=".alreembak,.xlsx,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,application/octet-stream" tabindex="-1" style="position:fixed;left:-10000px;top:0;width:1px;min-width:0;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="restoreFile(this)"></div><div class="panel"><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>نوع الصنف</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="list"></tbody></table></div><div id="empty" class="empty"><span class="empty-icon">▤</span>دفترك جاهز لأول حساب<br><p class="muted">ابدأ بإضافة حسابك الأول، ثم سجّل دفعاته بسهولة.</p><button onclick="newAccount()">＋ إضافة حساب</button></div></div><p class="notice">هذه نسخة تجريبية مستقلة عن الصفحة الأساسية. البيانات تُحفظ تلقائيًا في هذا المتصفح ولا تتزامن بين الأجهزة. النسخ الجديدة مشفّرة وتشمل الحسابات والدفعات وسلة المحذوفات. يمكنك استيراد النسخ القديمة أيضًا.</p><div class="backupbar"><span id="backupDate">لم تُصدّر نسخة احتياطية بعد</span><span>العملة: شيكل إسرائيلي · ₪ &nbsp; <span id="exporting"></span></span></div></main><dialog id="settingsDialog" class="preferences-dialog" aria-labelledby="settingsTitle">
   <h2 id="settingsTitle">الإعدادات</h2>
   <form id="backupSettingsForm">
     <label for="backupMode">النسخ الاحتياطي التلقائي بعد كل حفظ</label>
@@ -39,7 +39,7 @@
 </dialog>
 <dialog id="loginDialog" class="preferences-dialog" aria-labelledby="loginTitle" oncancel="event.preventDefault()">
   <h2 id="loginTitle">تسجيل الدخول</h2>
-  <p class="muted">بيانات الدخول تخص هذا المتصفح. لا تشفّر الحسابات أو ملفات النسخ.</p>
+  <p class="muted">بيانات الدخول تخص هذا المتصفح. احتفظ بها لاستعادة النسخ المشفّرة، حتى عند الانتقال إلى جهاز آخر.</p>
   <form id="loginForm">
     <label for="loginUsername">اسم المستخدم</label>
     <input id="loginUsername" name="username" autocomplete="username" maxlength="80" required>
@@ -120,7 +120,25 @@ function workbookFiles(records){const backupRecords=[...records,...trash.flatMap
 'xl/_rels/workbook.xml.rels':'<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+names.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')+'<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>',
 'xl/styles.xml':'<?xml version="1.0" encoding="UTF-8"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Arial"/><color rgb="FF254C3D"/></font><font><b/><sz val="11"/><name val="Arial"/><color rgb="FFFFFFFF"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1B5B45"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf><xf numFmtId="4" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>',
 'xl/worksheets/sheet1.xml':sheetXml(summary,[1]),'xl/worksheets/sheet2.xml':sheetXml(rows,[5,6,7]),'xl/worksheets/sheet3.xml':sheetXml(payments,[4])}}
-function backup(){try{const bytes=zipFiles(workbookFiles(accounts)),blob=new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='AlReem-Backup-'+today()+'.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);const stamp=new Date().toLocaleString('ar-PS');localStorage.setItem(KEY+'-export',stamp);$('backupDate').textContent='آخر تصدير: '+stamp;toast('تم تجهيز ملف Excel للحفظ')}catch{alert('تعذر إنشاء النسخة الاحتياطية. حاول مجددًا.')}}
+async function backup() {
+  try {
+    const encrypted = await encryptBackup(JSON.stringify({version:2,accounts,trash}), backupCredentials);
+    const url = URL.createObjectURL(new Blob([encrypted], {type:'application/octet-stream'}));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'AlReem-Backup-' + today() + '.alreembak';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    const stamp = new Date().toLocaleString('ar-PS');
+    localStorage.setItem(KEY + '-export', stamp);
+    $('backupDate').textContent = 'آخر تصدير: ' + stamp;
+    toast('تم تجهيز النسخة المشفّرة للحفظ');
+  } catch (error) {
+    alert(error.message || 'تعذّر إنشاء النسخة المشفّرة.');
+  }
+}
 async function unzipWorkbook(buffer){const b=new Uint8Array(buffer),v=new DataView(buffer);let end=b.length-22;while(end>=Math.max(0,b.length-65557)&&v.getUint32(end,true)!==0x06054b50)end--;if(end<0||v.getUint32(end,true)!==0x06054b50)throw Error('ملف Excel غير صالح');const count=v.getUint16(end+10,true);if(count>2000)throw Error('ملف كبير جدًا');let pos=v.getUint32(end+16,true),total=0;const files={};for(let i=0;i<count;i++){if(v.getUint32(pos,true)!==0x02014b50)throw Error('ملف تالف');const method=v.getUint16(pos+10,true),packed=v.getUint32(pos+20,true),size=v.getUint32(pos+24,true),nl=v.getUint16(pos+28,true),extra=v.getUint16(pos+30,true),comment=v.getUint16(pos+32,true),offset=v.getUint32(pos+42,true),name=decode.decode(b.slice(pos+46,pos+46+nl));total+=size;if(total>40000000)throw Error('حجم البيانات أكبر من المسموح');if(v.getUint32(offset,true)!==0x04034b50)throw Error('ملف تالف');const start=offset+30+v.getUint16(offset+26,true)+v.getUint16(offset+28,true);if(start+packed>b.length)throw Error('ملف تالف');if(name.endsWith('.xml')||name.endsWith('.rels')){const raw=b.slice(start,start+packed);let data;if(method===0)data=raw;else if(method===8){try{data=new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer())}catch{throw Error('تعذر قراءة ضغط هذا الملف. استخدم ملف Excel الأصلي الذي صدرته من البرنامج أو متصفحًا أحدث.')}}else throw Error('نوع ضغط غير مدعوم');if(data.length!==size||crc32(data)!==v.getUint32(pos+16,true))throw Error('بيانات الملف غير سليمة');files[name]=decode.decode(data)}pos+=46+nl+extra+comment}return files}
 function parseXml(text){if(!text||/<!DOCTYPE|<!ENTITY/i.test(text))throw Error('ملف غير صالح');const doc=new DOMParser().parseFromString(text,'application/xml');if(doc.getElementsByTagName('parsererror').length)throw Error('بيانات Excel تالفة');return doc}
 function excelRows(text,strings){const doc=parseXml(text);return Array.from(doc.getElementsByTagName('row')).map(row=>{const out=[];for(const cell of row.getElementsByTagName('c')){if(cell.getElementsByTagName('f').length)throw Error('لا يمكن استعادة ملف يحتوي معادلات في بيانات النسخة الاحتياطية');const ref=cell.getAttribute('r')||'',letters=ref.match(/^[A-Z]+/);if(!letters)throw Error('خلايا غير صالحة');const col=[...letters[0]].reduce((n,c)=>n*26+c.charCodeAt(0)-64,0)-1;if(col>50)continue;const type=cell.getAttribute('t'),value=cell.getElementsByTagName('v')[0]?.textContent??'';out[col]=type==='inlineStr'?Array.from(cell.getElementsByTagName('t')).map(t=>t.textContent).join(''):type==='s'?(strings[Number(value)]??''):type==='str'?value:value===''?'':Number(value)}return out})}
@@ -130,7 +148,7 @@ let pendingRestore=null,restoreBusy=false,restoreToken=0;
 function restoreStatus(message,isError=false){$('restoreStatus').textContent=message;$('restoreStatus').style.color=isError?'#a32e2e':''}
 function cancelRestore(){restoreToken++;pendingRestore=null;restoreBusy=false;$('restore').value='';$('restoreDialog').close();$('exporting').textContent=''}
 function readBackupFile(file){return new Promise((resolve,reject)=>{const reader=new FileReader();let settled=false;const finish=(error,result)=>{if(settled)return;settled=true;clearTimeout(timer);error?reject(error):resolve(result)};const timer=setTimeout(()=>{finish(Error('تأخرت قراءة الملف. افتح تطبيق الملفات ونزّل النسخة على الآيفون أولًا، ثم اخترها مجددًا.'));reader.abort()},45000);reader.onload=()=>finish(null,reader.result);reader.onerror=()=>finish(Error('تعذرت قراءة الملف من الهاتف. نزّله من iCloud إلى «على الـ iPhone» ثم أعد المحاولة.'));reader.onabort=()=>finish(Error('تم إلغاء قراءة الملف'));try{reader.readAsArrayBuffer(file)}catch(e){finish(e)}})}
-async function restoreFile(input){if(restoreBusy)return;const file=input.files&&input.files[0];if(!file)return;const token=++restoreToken;restoreBusy=true;pendingRestore=null;$('restoreApply').hidden=true;$('restoreFilename').textContent=file.name;$('restoreSummary').textContent='';restoreStatus('جارٍ قراءة النسخة…');if(!$('restoreDialog').open)$('restoreDialog').showModal();$('exporting').textContent='جارٍ قراءة الملف…';try{if(!file.size)throw Error('الملف فارغ أو لم يكتمل تنزيله من iCloud. نزّله على الهاتف ثم أعد اختياره.');if(file.size>20000000)throw Error('الحد الأقصى للملف 20 ميجابايت');const buffer=await readBackupFile(file);if(token!==restoreToken)return;const bytes=new Uint8Array(buffer);let next;if(bytes[0]===0x50&&bytes[1]===0x4b){restoreStatus('جارٍ التحقق من حسابات ملف Excel…');next=await readExcel(buffer)}else{let data;try{data=JSON.parse(new TextDecoder('utf-8').decode(bytes).replace(/^\uFEFF/,''))}catch{throw Error('هذه ليست نسخة Excel أو JSON صالحة. اختر ملف النسخة الاحتياطية الأصلي، وليس PDF أو صورة.')}if(data.version!==1&&data.version!==2)throw Error('صيغة النسخة غير مدعومة');if(!Array.isArray(data.accounts))throw Error('بيانات الحسابات غير موجودة');next={accounts:validateRecords(data.accounts.map(a=>({...a,notes:a.notes||''}))),trash:validateTrash(data.trash||[])}}if(token!==restoreToken)return;validateState(next.accounts,next.trash);pendingRestore=next;const payments=receiptsFor(next.accounts).length;$('restoreSummary').textContent=next.accounts.length+' حركة حساب نشطة · '+payments+' دفعة · '+next.trash.length+' حساب في السلة';restoreStatus('النسخة جاهزة. اضغط «استعادة البيانات» لإتمام الاستيراد.');$('restoreApply').hidden=false}catch(e){if(token===restoreToken)restoreStatus('لم يتم الاستيراد: '+(e.message||'تعذرت قراءة النسخة')+' لم تتغير حساباتك الحالية.',true)}finally{if(token===restoreToken){restoreBusy=false;input.value='';$('exporting').textContent=''}}}
+async function restoreFile(input){if(restoreBusy)return;const file=input.files&&input.files[0];if(!file)return;const token=++restoreToken;restoreBusy=true;pendingRestore=null;$('restoreApply').hidden=true;$('restoreFilename').textContent=file.name;$('restoreSummary').textContent='';restoreStatus('جارٍ قراءة النسخة…');if(!$('restoreDialog').open)$('restoreDialog').showModal();$('exporting').textContent='جارٍ قراءة الملف…';try{if(!file.size)throw Error('الملف فارغ أو لم يكتمل تنزيله من iCloud. نزّله على الهاتف ثم أعد اختياره.');if(file.size>20000000)throw Error('الحد الأقصى للملف 20 ميجابايت');let buffer=await readBackupFile(file);if(token!==restoreToken)return;if(isEncryptedBackup(buffer)){restoreStatus('جارٍ فك تشفير النسخة…');buffer=await decryptBackup(buffer);if(token!==restoreToken)return}const bytes=new Uint8Array(buffer);let next;if(bytes[0]===0x50&&bytes[1]===0x4b){restoreStatus('جارٍ التحقق من حسابات ملف Excel…');next=await readExcel(buffer)}else{let data;try{data=JSON.parse(new TextDecoder('utf-8').decode(bytes).replace(/^\uFEFF/,''))}catch{throw Error('هذه ليست نسخة Excel أو JSON صالحة. اختر ملف النسخة الاحتياطية الأصلي، وليس PDF أو صورة.')}if(data.version!==1&&data.version!==2)throw Error('صيغة النسخة غير مدعومة');if(!Array.isArray(data.accounts))throw Error('بيانات الحسابات غير موجودة');next={accounts:validateRecords(data.accounts.map(a=>({...a,notes:a.notes||''}))),trash:validateTrash(data.trash||[])}}if(token!==restoreToken)return;validateState(next.accounts,next.trash);pendingRestore=next;const payments=receiptsFor(next.accounts).length;$('restoreSummary').textContent=next.accounts.length+' حركة حساب نشطة · '+payments+' دفعة · '+next.trash.length+' حساب في السلة';restoreStatus('النسخة جاهزة. اضغط «استعادة البيانات» لإتمام الاستيراد.');$('restoreApply').hidden=false}catch(e){if(token===restoreToken)restoreStatus('لم يتم الاستيراد: '+(e.message||'تعذرت قراءة النسخة')+' لم تتغير حساباتك الحالية.',true)}finally{if(token===restoreToken){restoreBusy=false;input.value='';$('exporting').textContent=''}}}
 function applyRestore(){if(!pendingRestore||restoreBusy)return;const next=pendingRestore;if(commit(next.accounts,next.trash)){pendingRestore=null;side='us';statusFilters.us='all';statusFilters.them='all';$('search').value='';render();$('restoreDialog').close();toast('تمت استعادة الحسابات والدفعات بنجاح')}else restoreStatus('تعذر حفظ النسخة في هذا المتصفح. لم تكتمل الاستعادة؛ تحقق من مساحة التخزين وحاول مجددًا.',true)}
 
 try{const stamp=localStorage.getItem(KEY+'-export');if(stamp)$('backupDate').textContent='آخر تصدير: '+stamp}catch{}
@@ -191,7 +209,7 @@ function printWhatsAppStatement(){if(!accounts.some(a=>a.id===whatsappAccountId)
 
 const backupPreferencesKey = KEY + '-backup-mode';
 const loginKey = KEY + '-login';
-const sessionKey = KEY + '-session';
+let backupCredentials = null;
 let backupQueue = Promise.resolve();
 let backupStatus = '';
 
@@ -228,21 +246,23 @@ function queueAutomaticBackup() {
   const mode = savedBackupMode();
   if (mode === 'off') return;
   const snapshot = JSON.stringify({version:2, accounts, trash});
+  const credentials = backupCredentials;
   backupQueue = backupQueue.then(async () => {
-    if (savedBackupMode() !== mode) return;
+    if (savedBackupMode() !== mode || !credentials) return;
+    const encrypted = await encryptBackup(snapshot, credentials);
     const created = new Date().toISOString();
     if (mode === 'local') {
-      await backupStore(store => store.put({snapshot, created}, 'latest'), 'readwrite');
+      await backupStore(store => store.put({encrypted, created}, 'latest'), 'readwrite');
     } else {
       const folder = await backupStore(store => store.get('folder'));
       if (!folder || await folder.queryPermission({mode:'readwrite'}) !== 'granted') {
         showBackupStatus('الحفظ في المجلد متوقف. افتح الإعدادات واضغط «اختيار مجلد» لإعادة السماح.');
         return;
       }
-      const file = await folder.getFileHandle('AlReem-Auto-Backup.json', {create:true});
+      const file = await folder.getFileHandle('AlReem-Auto-Backup.alreembak', {create:true});
       const stream = await file.createWritable();
       try {
-        await stream.write(snapshot);
+        await stream.write(encrypted);
         await stream.close();
       } catch (error) {
         await stream.abort().catch(() => {});
@@ -260,7 +280,7 @@ async function openSettings() {
   $('chooseBackupFolder').hidden = $('folderMode').disabled;
   $('folderSupport').textContent = $('folderMode').disabled
     ? 'هذا المتصفح يدعم النسخ داخل التطبيق. اختيار مجلد يتطلب متصفحًا يدعم الوصول إلى المجلدات.'
-    : 'النسخة الخارجية تُحدّث في ملف AlReem-Auto-Backup.json داخل المجلد المختار.';
+    : 'النسخة الخارجية تُحدّث في ملف AlReem-Auto-Backup.alreembak داخل المجلد المختار.';
   $('autoBackupStatus').textContent = backupStatus;
   $('settingsDialog').showModal();
   try {
@@ -319,7 +339,9 @@ async function restoreLocalBackup() {
   try {
     const latest = await backupStore(store => store.get('latest'));
     if (!latest) return;
-    const file = new File([latest.snapshot], 'AlReem-Auto-Backup.json', {type:'application/json'});
+    const file = latest.encrypted
+      ? new File([latest.encrypted], 'AlReem-Auto-Backup.alreembak')
+      : new File([latest.snapshot], 'AlReem-Auto-Backup.json', {type:'application/json'});
     $('settingsDialog').close();
     await restoreFile({files:[file], value:''});
   } catch {
@@ -347,7 +369,7 @@ function requireLocalLogin() {
   $('loginSubmit').textContent = setup ? 'إنشاء بيانات الدخول' : 'دخول';
   $('loginPassword').autocomplete = setup ? 'new-password' : 'current-password';
   $('loginPassword').minLength = setup ? 8 : 1;
-  const signedIn = !!record && sessionStorage.getItem(sessionKey) === record.id;
+  const signedIn = !!record && backupCredentials !== null;
   $('loginForm').reset();
   $('loginFeedback').textContent = '';
   if (!signedIn && !$('loginDialog').open) $('loginDialog').showModal();
@@ -374,7 +396,10 @@ $('loginForm').onsubmit = async event => {
     } else if (username !== record.username || await passwordVerifier(password, record.salt) !== record.verifier) {
       throw Error('اسم المستخدم أو كلمة المرور غير صحيحة.');
     }
-    sessionStorage.setItem(sessionKey, record.id);
+    backupCredentials = await crypto.subtle.importKey(
+      'raw', new TextEncoder().encode(JSON.stringify([username, password])),
+      'PBKDF2', false, ['deriveKey']
+    );
     requireLocalLogin();
   } catch (error) {
     $('loginFeedback').textContent = error.message || 'تعذّر تسجيل الدخول.';
@@ -384,9 +409,51 @@ $('loginForm').onsubmit = async event => {
 };
 
 function signOut() {
-  sessionStorage.removeItem(sessionKey);
+  backupCredentials = null;
   $('settingsDialog').close();
   requireLocalLogin();
+}
+
+const backupMagic = new TextEncoder().encode('ALREEM01');
+const backupHeaderLength = backupMagic.length + 16 + 12;
+
+function isEncryptedBackup(buffer) {
+  const bytes = new Uint8Array(buffer);
+  return backupMagic.every((byte, index) => bytes[index] === byte);
+}
+
+async function deriveBackupKey(credentials, salt) {
+  if (!credentials) throw Error('سجّل الدخول أولًا.');
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2',hash:'SHA-256',salt,iterations:600000},
+    credentials, {name:'AES-GCM',length:256}, false, ['encrypt','decrypt']
+  );
+}
+
+async function encryptBackup(snapshot, credentials) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const header = joinBytes([backupMagic,salt,iv]);
+  const key = await deriveBackupKey(credentials,salt);
+  const ciphertext = await crypto.subtle.encrypt(
+    {name:'AES-GCM',iv,additionalData:header},key,new TextEncoder().encode(snapshot)
+  );
+  return joinBytes([header,new Uint8Array(ciphertext)]);
+}
+
+async function decryptBackup(buffer) {
+  if (buffer.byteLength < backupHeaderLength + 16) throw Error('ملف النسخة المشفّرة ناقص.');
+  const header = new Uint8Array(buffer,0,backupHeaderLength);
+  const salt = header.slice(backupMagic.length,backupMagic.length+16);
+  const iv = header.slice(backupMagic.length+16);
+  const key = await deriveBackupKey(backupCredentials,salt);
+  try {
+    return await crypto.subtle.decrypt(
+      {name:'AES-GCM',iv,additionalData:header},key,buffer.slice(backupHeaderLength)
+    );
+  } catch {
+    throw Error('تعذّر فك التشفير. سجّل الدخول باسم المستخدم وكلمة المرور اللذين أُنشئت بهما النسخة، وتأكد من سلامة الملف.');
+  }
 }
 
 requireLocalLogin();
