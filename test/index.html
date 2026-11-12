@@ -17,15 +17,21 @@
 .whatsapp-button{color:#13744d;border-color:#b8ddc8;background:#f3fbf5}.whatsapp-button:hover{background:#e3f6e9}.phone-number{font-variant-numeric:tabular-nums;unicode-bidi:isolate}.share-step{border:1px solid #dce8dc;border-radius:12px;padding:20px;margin:18px 0}.share-step p{font-size:13px;line-height:1.9;color:#637765}.whatsapp-link{display:inline-block;background:#187a50;color:white;padding:12px 20px;border-radius:9px;text-decoration:none;cursor:pointer}#whatsappDialog{width:min(600px,94vw)}@media print{#whatsappDialog{display:none!important}}
 .account-actions .icon-action{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:9px;flex:0 0 42px}.icon-action svg{display:block;pointer-events:none}.icon-action:focus-visible{outline:3px solid #bd9663;outline-offset:2px}.preferences-dialog{width:min(530px,94vw)}.preferences-dialog form{display:grid;gap:9px}.preferences-dialog p{margin:4px 0;line-height:1.65}.preferences-dialog .row{margin-top:12px}#loginFeedback{color:#a42e2e}
 .preferences-dialog [hidden]{display:none!important}
-</style><header><div><span class="brand-icon">▥</span><h1>منجرة الريم</h1><small>إدارة الحسابات والدفعات</small></div><span class="testflag">نسخة تجريبية مستقلة</span><div class="navlabel">مساحة العمل</div><div class="navitem selected">▦ &nbsp; الحسابات</div><button class="navitem nav-secondary" onclick="openStatements()">↙ &nbsp; الدفعات وكشوف الحساب</button><button class="navitem nav-secondary" onclick="openTrash()">سلة المحذوفات <span id="trashCount">0</span></button><div class="sidebar-bottom">منجرة الريم<br>إدارة بسيطة. حسابات واضحة.<br><span style="color:#789e8b">الإصدار التجريبي 2.7.0</span></div><button class="navitem nav-secondary" onclick="openSettings()">⚙ الإعدادات</button><button class="navitem nav-secondary" onclick="showSyncSettings()">المزامنة</button><small id="syncState" role="status">الحفظ على هذا الجهاز</small></header><main><div class="pagebar"><span>مساحة العمل &nbsp; / &nbsp; <b>الحسابات</b></span><span class="account-label"><span class="avatar">ر</span> منجرة الريم</span></div><div class="top"><div><div class="eyebrow">الإدارة المالية</div><h2>حساباتك، بوضوح.</h2><small id="today"></small></div><button class="primary" onclick="newAccount()">＋ إضافة حساب</button></div><div class="cards"><div class="card">إجمالي المتبقي لنا<strong class="green" id="ours"></strong><span class="caption">أرصدة مستحقة للتحصيل</span></div><div class="card">إجمالي المتبقي علينا<strong class="red" id="theirs"></strong><span class="caption">التزامات مستحقة للدفع</span></div><div class="card">صافي الرصيد <span class="muted">(لنا − علينا)</span><strong id="net"></strong><span class="caption">الفرق بين حقوقك والتزاماتك</span></div></div><div class="section-title">سجل الحسابات <span class="counter" id="accountCount">0 حساب</span></div><div class="status-tabs" role="group" aria-label="حالة الحساب"><button id="status-unpaid" onclick="setStatusFilter('unpaid')">غير مسددة</button><button id="status-paid" onclick="setStatusFilter('paid')">مسددة</button><button id="status-all" onclick="setStatusFilter('all')">جميع الحسابات</button></div><p class="status-hint">الحسابات المسددة والأرصدة لصالح الزبون تظهر ضمن فلتر «مسددة». البحث يشمل القائمة والحالة المختارتين.</p><div class="toolbar"><div class="tabs"><button id="tab-us" class="active" onclick="switchTab('us')">لنا (حساب)</button><button id="tab-them" onclick="switchTab('them')">علينا (حساب)</button></div><input id="search" placeholder="البحث باسم العميل، الصنف أو رقم الشيك…" oninput="render()"><button onclick="backup()">تصدير نسخة مشفّرة ↓</button><button onclick="document.getElementById('restore').click()">استيراد نسخة ↑</button><input type="file" id="restore" accept=".alreembak,.xlsx,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,application/octet-stream" tabindex="-1" style="position:fixed;left:-10000px;top:0;width:1px;min-width:0;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="restoreFile(this)"></div><div class="panel"><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>نوع الصنف</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="list"></tbody></table></div><div id="empty" class="empty"><span class="empty-icon">▤</span>دفترك جاهز لأول حساب<br><p class="muted">ابدأ بإضافة حسابك الأول، ثم سجّل دفعاته بسهولة.</p><button onclick="newAccount()">＋ إضافة حساب</button></div></div><p class="notice">هذه نسخة تجريبية مستقلة عن الصفحة الأساسية. يمكنك حفظ الحسابات على هذا الجهاز أو تفعيل المزامنة بين أجهزتك. النسخ الجديدة مشفّرة وتشمل الحسابات والدفعات وسلة المحذوفات. يمكنك استيراد النسخ القديمة أيضًا.</p><div class="backupbar"><span id="backupDate">لم تُصدّر نسخة احتياطية بعد</span><span>العملة: شيكل إسرائيلي · ₪ &nbsp; <span id="exporting"></span></span></div></main><dialog id="settingsDialog" class="preferences-dialog" aria-labelledby="settingsTitle">
+#driveSettings[hidden]{display:none!important}</style><script src="https://accounts.google.com/gsi/client" async defer></script><header><div><span class="brand-icon">▥</span><h1>منجرة الريم</h1><small>إدارة الحسابات والدفعات</small></div><span class="testflag">نسخة تجريبية مستقلة</span><div class="navlabel">مساحة العمل</div><div class="navitem selected">▦ &nbsp; الحسابات</div><button class="navitem nav-secondary" onclick="openStatements()">↙ &nbsp; الدفعات وكشوف الحساب</button><button class="navitem nav-secondary" onclick="openTrash()">سلة المحذوفات <span id="trashCount">0</span></button><div class="sidebar-bottom">منجرة الريم<br>إدارة بسيطة. حسابات واضحة.<br><span style="color:#789e8b">الإصدار التجريبي 2.7.1</span></div><button class="navitem nav-secondary" onclick="openSettings()">⚙ الإعدادات</button><button class="navitem nav-secondary" onclick="showSyncSettings()">المزامنة</button><small id="syncState" role="status">الحفظ على هذا الجهاز</small></header><main><div class="pagebar"><span>مساحة العمل &nbsp; / &nbsp; <b>الحسابات</b></span><span class="account-label"><span class="avatar">ر</span> منجرة الريم</span></div><div class="top"><div><div class="eyebrow">الإدارة المالية</div><h2>حساباتك، بوضوح.</h2><small id="today"></small></div><button class="primary" onclick="newAccount()">＋ إضافة حساب</button></div><div class="cards"><div class="card">إجمالي المتبقي لنا<strong class="green" id="ours"></strong><span class="caption">أرصدة مستحقة للتحصيل</span></div><div class="card">إجمالي المتبقي علينا<strong class="red" id="theirs"></strong><span class="caption">التزامات مستحقة للدفع</span></div><div class="card">صافي الرصيد <span class="muted">(لنا − علينا)</span><strong id="net"></strong><span class="caption">الفرق بين حقوقك والتزاماتك</span></div></div><div class="section-title">سجل الحسابات <span class="counter" id="accountCount">0 حساب</span></div><div class="status-tabs" role="group" aria-label="حالة الحساب"><button id="status-unpaid" onclick="setStatusFilter('unpaid')">غير مسددة</button><button id="status-paid" onclick="setStatusFilter('paid')">مسددة</button><button id="status-all" onclick="setStatusFilter('all')">جميع الحسابات</button></div><p class="status-hint">الحسابات المسددة والأرصدة لصالح الزبون تظهر ضمن فلتر «مسددة». البحث يشمل القائمة والحالة المختارتين.</p><div class="toolbar"><div class="tabs"><button id="tab-us" class="active" onclick="switchTab('us')">لنا (حساب)</button><button id="tab-them" onclick="switchTab('them')">علينا (حساب)</button></div><input id="search" placeholder="البحث باسم العميل، الصنف أو رقم الشيك…" oninput="render()"><button onclick="backup()">تصدير نسخة مشفّرة ↓</button><button onclick="document.getElementById('restore').click()">استيراد نسخة ↑</button><input type="file" id="restore" accept=".alreembak,.xlsx,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,application/octet-stream" tabindex="-1" style="position:fixed;left:-10000px;top:0;width:1px;min-width:0;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="restoreFile(this)"></div><div class="panel"><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>نوع الصنف</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="list"></tbody></table></div><div id="empty" class="empty"><span class="empty-icon">▤</span>دفترك جاهز لأول حساب<br><p class="muted">ابدأ بإضافة حسابك الأول، ثم سجّل دفعاته بسهولة.</p><button onclick="newAccount()">＋ إضافة حساب</button></div></div><p class="notice">هذه نسخة تجريبية مستقلة عن الصفحة الأساسية. يمكنك حفظ الحسابات على هذا الجهاز أو تفعيل المزامنة بين أجهزتك. النسخ الجديدة مشفّرة وتشمل الحسابات والدفعات وسلة المحذوفات. يمكنك استيراد النسخ القديمة أيضًا.</p><div class="backupbar"><span id="backupDate">لم تُصدّر نسخة احتياطية بعد</span><span>العملة: شيكل إسرائيلي · ₪ &nbsp; <span id="exporting"></span></span></div></main><dialog id="settingsDialog" class="preferences-dialog" aria-labelledby="settingsTitle">
   <h2 id="settingsTitle">الإعدادات</h2>
   <form id="backupSettingsForm">
     <label for="backupMode">النسخ الاحتياطي التلقائي بعد كل حفظ</label>
-    <select id="backupMode">
+    <select id="backupMode" onchange="renderDriveSettings()">
       <option value="off">إيقاف النسخ التلقائي</option>
-      <option value="local">حفظ نسخة داخل التطبيق</option>
+      <option value="local">حفظ نسخة داخل التطبيق</option><option value="drive">حفظ في Google Drive</option>
       <option id="folderMode" value="folder">حفظ في مجلد أختاره</option>
     </select>
+    <div id="driveSettings" hidden>
+      <p id="driveConnection" role="status"></p>
+      <div id="driveClientRow"><label for="driveClientId">معرّف OAuth لتطبيق الويب</label><input id="driveClientId" dir="ltr" placeholder="…apps.googleusercontent.com"></div>
+      <button type="button" onclick="connectDrive()">ربط حساب Gmail</button>
+      <button id="driveDisconnect" type="button" hidden onclick="disconnectDrive()">قطع ربط Drive</button>
+    </div>
     <p id="folderSupport" class="muted"></p>
     <a id="openStandaloneBackup" hidden target="_blank" rel="noopener">فتح التطبيق في تبويب مستقل</a>
     <p id="backupFolderName"></p>
@@ -264,12 +270,15 @@ function queueAutomaticBackup() {
   if (mode === 'off') return;
   const snapshot = JSON.stringify({version:2, accounts, trash});
   const credentials = backupCredentials;
+  const grant = driveGrant;
   backupQueue = backupQueue.then(async () => {
     if (savedBackupMode() !== mode || !credentials) return;
     const encrypted = await encryptBackup(snapshot, credentials);
     const created = new Date().toISOString();
     if (mode === 'local') {
       await backupStore(store => store.put({encrypted, created}, 'latest'), 'readwrite');
+    } else if (mode === 'drive') {
+      await saveDriveBackup(encrypted,grant);
     } else {
       const folder = await backupStore(store => store.get('folder'));
       if (!folder || await folder.queryPermission({mode:'readwrite'}) !== 'granted') {
@@ -288,12 +297,13 @@ function queueAutomaticBackup() {
       }
     }
     showBackupStatus('آخر نسخة تلقائية: ' + new Date(created).toLocaleString('ar-PS'));
-  }).catch(() => showBackupStatus('تعذّر حفظ النسخة التلقائية. يمكنك المحاولة من الإعدادات أو تصدير نسخة يدويًا.'));
+  }).catch(error => showBackupStatus(mode === 'drive' ? error.message : 'تعذّر حفظ النسخة التلقائية. يمكنك المحاولة من الإعدادات أو تصدير نسخة يدويًا.'));
 }
 
 async function openSettings() {
   const mode = savedBackupMode();
   $('backupMode').value = mode;
+  renderDriveSettings();
   const embedded = window.top !== window;
   const folderAvailable = !embedded && typeof window.showDirectoryPicker === 'function';
   const fileAvailable = !embedded && typeof window.showSaveFilePicker === 'function';
@@ -365,6 +375,7 @@ $('backupSettingsForm').onsubmit = async event => {
   event.preventDefault();
   const mode = $('backupMode').value;
   try {
+    if (mode === 'drive' && !driveReady()) { showBackupStatus('اربط Google Drive أولًا.'); return; }
     if (mode === 'folder' && !await backupStore(store => store.get('folder'))) {
       showBackupStatus('اختر مجلدًا أو ملفًا للنسخة أولًا.');
       return;
@@ -463,6 +474,7 @@ async function signOut() {
   if (cloudSession) await disconnectCloud();
   if (cloudSession) return;
   backupCredentials = null;
+  disconnectDrive(false);
   $('settingsDialog').close();
   requireLocalLogin();
 }
@@ -716,9 +728,128 @@ async function commit(next, nextTrash = trash) {
   }
 }
 
+const driveClientKey = KEY + '-drive-client';
+const driveDeviceKey = KEY + '-drive-device';
+const configuredDriveClient = '';
+let driveGrant = null;
+let driveConnecting = false;
+
+function driveClientId() {
+  return configuredDriveClient || localStorage.getItem(driveClientKey) || '';
+}
+
+function driveReady() {
+  return driveGrant && Date.now() < driveGrant.expires;
+}
+
+function renderDriveSettings() {
+  const enabled = $('backupMode').value === 'drive';
+  $('driveSettings').hidden = !enabled;
+  $('driveClientId').value = driveClientId();
+  $('driveClientRow').hidden = !!configuredDriveClient;
+  $('driveDisconnect').hidden = !driveGrant;
+  $('driveConnection').textContent = driveReady()
+    ? 'تم ربط Google Drive لهذه الجلسة.'
+    : 'اربط حساب Google للسماح بحفظ النسخ المشفّرة.';
+}
+
+function connectDrive() {
+  if (driveConnecting) return;
+  const clientId = configuredDriveClient || $('driveClientId').value.trim();
+  if (!/^[a-z0-9-]+\.apps\.googleusercontent\.com$/i.test(clientId)) {
+    showBackupStatus('أدخل معرّف OAuth لتطبيق ويب من Google Cloud.');
+    return;
+  }
+  if (!window.google?.accounts?.oauth2) {
+    showBackupStatus('تعذّر تحميل تسجيل الدخول من Google. تحقق من الاتصال وأعد فتح الصفحة.');
+    return;
+  }
+  driveConnecting = true;
+  try {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: 'https://www.googleapis.com/auth/drive.file',
+      include_granted_scopes: false,
+      callback(response) {
+        driveConnecting = false;
+        if (!response.access_token || !google.accounts.oauth2.hasGrantedAllScopes(response,'https://www.googleapis.com/auth/drive.file')) {
+          showBackupStatus('لم يكتمل إذن الحفظ في Google Drive.');
+          return;
+        }
+        if (!backupCredentials) return;
+        driveGrant = {token:response.access_token,expires:Date.now() + Number(response.expires_in) * 1000 - 30000};
+        localStorage.setItem(driveClientKey,clientId);
+        renderDriveSettings();
+        showBackupStatus('تم الربط. اضغط «حفظ الإعدادات» لإنشاء نسخة الآن.');
+      },
+      error_callback() {
+        driveConnecting = false;
+        showBackupStatus('تعذّر فتح نافذة Google أو أُغلقت قبل الربط.');
+      }
+    });
+    client.requestAccessToken({prompt:'select_account'});
+  } catch {
+    driveConnecting = false;
+    showBackupStatus('تعذّر بدء تسجيل الدخول إلى Google.');
+  }
+}
+
+function disconnectDrive(revoke = true) {
+  const token = driveGrant?.token;
+  driveGrant = null;
+  if (revoke && token && window.google?.accounts?.oauth2) {
+    google.accounts.oauth2.revoke(token, () => {});
+  }
+  renderDriveSettings();
+}
+
+async function driveRequest(url, options, grant) {
+  if (driveGrant !== grant || !driveReady()) throw Error('أعد ربط Google Drive من الإعدادات.');
+  const response = await fetch(url, {...options,headers:{...options.headers,Authorization:'Bearer ' + grant.token}});
+  if (response.status === 401) {
+    if (driveGrant === grant) disconnectDrive(false);
+    throw Error('انتهى إذن Google Drive. أعد الربط من الإعدادات.');
+  }
+  if (!response.ok) throw Error('تعذّر حفظ النسخة في Google Drive. تحقق من تفعيل Drive API وإذن الحساب.');
+  return response.json();
+}
+
+async function saveDriveBackup(encrypted, grant) {
+  let device = localStorage.getItem(driveDeviceKey);
+  if (!device) {
+    device = crypto.randomUUID();
+    localStorage.setItem(driveDeviceKey,device);
+  }
+  const query = new URLSearchParams({
+    q:"trashed = false and appProperties has { key='alreemBackupDevice' and value='" + device + "' }",
+    fields:'files(id)', pageSize:'1'
+  });
+  const result = await driveRequest('https://www.googleapis.com/drive/v3/files?' + query, {}, grant);
+  const existing = result.files?.[0]?.id;
+  const url = 'https://www.googleapis.com/upload/drive/v3/files';
+  if (existing) {
+    await driveRequest(url + '/' + encodeURIComponent(existing) + '?uploadType=media', {
+      method:'PATCH',headers:{'Content-Type':'application/octet-stream'},body:encrypted
+    },grant);
+    return;
+  }
+  const boundary = 'alreem_' + crypto.randomUUID();
+  const metadata = {name:'AlReem-Backup-' + device.slice(0,8) + '.alreembak',appProperties:{alreemBackupDevice:device}};
+  const body = new Blob([
+    '--' + boundary + '\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n',
+    JSON.stringify(metadata),
+    '\r\n--' + boundary + '\r\nContent-Type: application/octet-stream\r\n\r\n',
+    encrypted,'\r\n--' + boundary + '--'
+  ]);
+  await driveRequest(url + '?uploadType=multipart', {
+    method:'POST',headers:{'Content-Type':'multipart/related; boundary=' + boundary},body
+  },grant);
+}
+
 requireLocalLogin();
 
 </script></html>
+
 
 
 
