@@ -9,7 +9,10 @@
 .movement-actions,.payment-actions,.trash-actions{white-space:nowrap}#detail{width:min(960px,96vw)}#detail .cards{grid-template-columns:repeat(3,1fr)}#detail .cards strong{display:block;font-size:23px;margin-top:10px}#detail h3{margin-top:28px}input[readonly]{background:#edf3e9;color:#46604c}#entryHint{line-height:1.9}@media(max-width:760px){#detail{padding:20px}#detail .cards strong{font-size:18px}#detail .row button{min-width:120px}}
 #statements{width:min(1100px,96vw)}.nav-secondary{text-align:right;border:0;background:transparent;line-height:1.8;width:100%;cursor:pointer}.nav-secondary:hover{background:#31584e;color:white}.statement-filters{margin:24px 0 18px}.statement-filters label{min-width:180px}#statements h3{margin-top:28px}@media(max-width:760px){header .nav-secondary{display:block;font-size:11px;width:auto;max-width:140px;margin:0;padding:7px;color:#e2eee7}header .testflag{display:none}#statements{padding:20px}}@media print{#statements{display:none!important}}
 [hidden]{display:none!important}
-html[data-login-locked] body > :is(header, main, dialog:not(#loginDialog), #toast, #print){display:none!important}
+html[data-login-locked] body > header, html[data-login-locked] body > main, html[data-login-locked] body > dialog, html[data-login-locked] #toast, html[data-login-locked] #print{display:none!important}
+#loginScreen{display:none;margin:clamp(20px,10vh,100px) auto 24px;padding:clamp(20px,5vw,36px);background:white;border:1px solid #e0e8dc;border-radius:18px}
+html[data-login-locked] #loginScreen{display:block}
+#loginScreen input{width:100%}
 .payment-actions{min-width:140px}.payment-actions button{margin:3px}.delete-payment{color:#a03b32;border-color:#e7c8c1}#savePayment:disabled{opacity:.55}
 .balance-status{display:inline-flex;flex-direction:row;align-items:center;gap:8px;flex-wrap:nowrap;white-space:nowrap;vertical-align:middle}.balance-status>b,.balance-status>.badge{flex:0 0 auto}.balance-status>.badge{display:inline-flex;align-items:center;line-height:1.2;margin:0}
 .status-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.status-tabs button{background:#eef2e9;color:#506c59;border-color:#dfe6d8;padding:11px 18px}.status-tabs button.active{background:#1c604a;color:white;border-color:#1c604a}.status-hint{font-size:11px;color:#768974;line-height:1.9;margin:0 0 18px}.cheque-search{margin:18px 0;max-width:380px}@media(max-width:760px){.status-tabs{gap:5px}.status-tabs button{padding:10px;font-size:11px;flex:1}.status-hint{font-size:10px}}
@@ -47,7 +50,7 @@ html[data-login-locked] body > :is(header, main, dialog:not(#loginDialog), #toas
     <button onclick="$('settingsDialog').close()">إغلاق</button>
   </div>
 </dialog>
-<dialog id="loginDialog" closedby="none" class="preferences-dialog" aria-labelledby="loginTitle" oncancel="event.preventDefault()">
+<section id="loginScreen" class="preferences-dialog" aria-labelledby="loginTitle">
   <h2 id="loginTitle">تسجيل الدخول</h2>
   <p class="muted">بيانات الدخول تخص هذا المتصفح. احتفظ بها لاستعادة النسخ المشفّرة، حتى عند الانتقال إلى جهاز آخر.</p>
   <form id="loginForm">
@@ -58,7 +61,7 @@ html[data-login-locked] body > :is(header, main, dialog:not(#loginDialog), #toas
     <button id="loginSubmit" class="primary" type="submit">دخول</button>
     <p id="loginFeedback" role="status" aria-live="polite"></p>
   </form>
-</dialog>
+</section>
 <dialog id="syncDialog" class="preferences-dialog" aria-labelledby="syncTitle" oncancel="if(cloudBusy)event.preventDefault()">
 <h2 id="syncTitle">المزامنة بين الأجهزة</h2>
 <p class="muted">استخدم بريد المزامنة وكلمة المرور نفسيهما على كل جهاز. عند الاتصال تُعرض حسابات Firebase. عند قطع الاتصال تعود إلى حسابات هذا الجهاز.</p>
@@ -435,8 +438,7 @@ function requireLocalLogin() {
   $('loginForm').reset();
   $('loginFeedback').textContent = '';
   document.documentElement.toggleAttribute('data-login-locked', !signedIn);
-  if (!signedIn && !$('loginDialog').open) $('loginDialog').showModal();
-  if (signedIn && $('loginDialog').open) $('loginDialog').close();
+  if (!signedIn) $('loginUsername').focus();
 }
 
 $('loginForm').onsubmit = async event => {
@@ -917,9 +919,6 @@ async function saveDriveBackup(encrypted, grant) {
   },grant);
 }
 
-$('loginDialog').addEventListener('close', () => {
-  if (!backupCredentials) requireLocalLogin();
-});
 window.addEventListener('pagehide', event => {
   if (event.persisted) document.documentElement.setAttribute('data-login-locked', '');
 });
