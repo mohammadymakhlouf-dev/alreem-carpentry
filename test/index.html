@@ -30,10 +30,11 @@ html[data-login-locked] #loginScreen{display:block}
       <option value="local">حفظ نسخة داخل التطبيق</option><option value="drive">حفظ في Google Drive</option>
       <option id="folderMode" value="folder">حفظ في مجلد أختاره</option>
     </select>
-    <div id="driveSettings" hidden>
+    <div id="driveSettings">
       <p id="driveConnection" role="status"></p>
       <div id="driveClientRow"><label for="driveClientId">معرّف OAuth لتطبيق الويب</label><input id="driveClientId" dir="ltr" placeholder="…apps.googleusercontent.com"></div>
       <button type="button" onclick="connectDrive()">ربط حساب Gmail</button>
+      <button id="driveSaveNow" type="button" onclick="saveDriveNow()">حفظ الآن في Google Drive</button>
       <button id="driveDisconnect" type="button" hidden onclick="disconnectDrive()">قطع ربط Drive</button>
     </div>
     <p id="folderSupport" class="muted"></p>
@@ -66,7 +67,6 @@ html[data-login-locked] #loginScreen{display:block}
 <h2 id="syncTitle">المزامنة بين الأجهزة</h2>
 <p class="muted">استخدم بريد المزامنة وكلمة المرور نفسيهما على كل جهاز. عند الاتصال تُعرض حسابات Firebase. عند قطع الاتصال تعود إلى حسابات هذا الجهاز.</p>
 <form id="syncAuthForm">
-<label>سجل المزامنة<select id="syncLedger"><option value="androidSubscriptionLedgers">السجل المشترك مع أندرويد</option><option value="testLedgers">سجل الويب التجريبي السابق</option></select></label>
 <label for="syncEmail">بريد المزامنة</label><input id="syncEmail" type="email" autocomplete="username" required>
 <label for="syncPassword">كلمة مرور المزامنة</label><input id="syncPassword" type="password" autocomplete="current-password" required minlength="8">
 <label><input id="syncCopyLocal" type="checkbox"> نسخ الحسابات المحلية إلى Firebase عند إنشاء سجل المزامنة لأول مرة</label>
@@ -654,7 +654,7 @@ function showSyncSettings() {
 }
 
 function syncError(error) {
-  if (error.code === 'permission-denied') return 'رفض Firebase العملية. تحقق من نشر قواعد السجل المشترك ومن صلاحية الاشتراك عند الحفظ.';
+  if (error.code === 'permission-denied') return 'رفض Firebase الوصول إلى سجل الحساب. تحقّق من قواعد Firestore.';
   if (error.code === 'auth/email-already-in-use') return 'هذا البريد مسجّل. اختر تسجيل الدخول.';
   if (error.code?.startsWith('auth/')) return 'تعذّر الدخول. تحقّق من البريد وكلمة المرور والاتصال.';
   if (error.code === 'unavailable') return 'الاتصال بالمزامنة غير متاح الآن. حاول مرة أخرى بعد عودة الاتصال.';
@@ -675,19 +675,7 @@ $('syncAuthForm').onsubmit = async event => {
     sdk = await loadSync();
     const method = create ? sdk.auth.createUserWithEmailAndPassword : sdk.auth.signInWithEmailAndPassword;
     const {user} = await method(sdk.authentication,email,password);
-    const collection = $('syncLedger').value;
-    if (collection === 'androidSubscriptionLedgers') {
-      const trial = sdk.db.doc(sdk.firestore,'androidTrials',user.uid);
-      const subscription = sdk.db.doc(sdk.firestore,'androidSubscriptions',user.uid);
-      await sdk.db.runTransaction(sdk.firestore, async transaction => {
-        const managed = await transaction.get(subscription);
-        const existing = await transaction.get(trial);
-        if (!managed.exists() && !existing.exists()) {
-          transaction.set(trial,{startedAt:sdk.db.serverTimestamp()});
-        }
-      });
-    }
-    const ref = sdk.db.doc(sdk.firestore,collection,user.uid);
+    const ref = sdk.db.doc(sdk.firestore,'testLedgers',user.uid);
     const first = await sdk.db.runTransaction(sdk.firestore, async transaction => {
       const snapshot = await transaction.get(ref);
       if (snapshot.exists()) return readCloud(snapshot);
@@ -804,14 +792,13 @@ function driveReady() {
 }
 
 function renderDriveSettings() {
-  const enabled = $('backupMode').value === 'drive';
-  $('driveSettings').hidden = !enabled;
   $('driveClientId').value = driveClientId();
   $('driveClientRow').hidden = !!configuredDriveClient;
   $('driveDisconnect').hidden = !driveGrant;
   $('driveConnection').textContent = driveReady()
     ? 'تم ربط Google Drive لهذه الجلسة.'
     : 'اربط حساب Google للسماح بحفظ النسخ المشفّرة.';
+  $('driveSaveNow').disabled = !driveReady();
 }
 
 function connectDrive() {
@@ -841,7 +828,7 @@ function connectDrive() {
         driveGrant = {token:response.access_token,expires:Date.now() + Number(response.expires_in) * 1000 - 30000};
         localStorage.setItem(driveClientKey,clientId);
         renderDriveSettings();
-        showBackupStatus('تم الربط. اضغط «حفظ الإعدادات» لإنشاء نسخة الآن.');
+        showBackupStatus('تم الربط. اضغط «حفظ الآن في Google Drive» لإنشاء نسخة.');
       },
       error_callback() {
         driveConnecting = false;
@@ -941,6 +928,23 @@ async function openDriveRestore() {
   } catch (error) {
     if (active()) status.textContent = error.message || 'تعذّر عرض النسخ.';
   }
+}
+
+function saveDriveNow() {
+  if (!backupCredentials || !driveReady()) return;
+  const grant = driveGrant;
+  const credentials = backupCredentials;
+  const snapshot = JSON.stringify({version:2, accounts, trash});
+  const button = $('driveSaveNow');
+  button.disabled = true;
+  showBackupStatus('جارٍ حفظ النسخة في Google Drive…');
+  backupQueue = backupQueue.then(async () => {
+    if (backupCredentials !== credentials) return;
+    const encrypted = await encryptBackup(snapshot, credentials);
+    await saveDriveBackup(encrypted, grant);
+    showBackupStatus('تم حفظ النسخة المشفّرة في Google Drive.');
+  }).catch(error => showBackupStatus(error.message || 'تعذّر حفظ النسخة في Google Drive.'))
+    .finally(renderDriveSettings);
 }
 
 async function saveDriveBackup(encrypted, grant) {
