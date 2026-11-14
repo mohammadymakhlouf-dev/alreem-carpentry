@@ -21,8 +21,11 @@ html[data-login-locked] #loginScreen{display:block}
 .whatsapp-button{color:#13744d;border-color:#b8ddc8;background:#f3fbf5}.whatsapp-button:hover{background:#e3f6e9}.phone-number{font-variant-numeric:tabular-nums;unicode-bidi:isolate}.share-step{border:1px solid #dce8dc;border-radius:12px;padding:20px;margin:18px 0}.share-step p{font-size:13px;line-height:1.9;color:#637765}.whatsapp-link{display:inline-block;background:#187a50;color:white;padding:12px 20px;border-radius:9px;text-decoration:none;cursor:pointer}#whatsappDialog{width:min(600px,94vw)}@media print{#whatsappDialog{display:none!important}}
 .account-actions .icon-action{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:9px;flex:0 0 42px}.icon-action svg{display:block;pointer-events:none}.icon-action:focus-visible{outline:3px solid #bd9663;outline-offset:2px}.preferences-dialog{width:min(530px,94vw)}.preferences-dialog form{display:grid;gap:9px}.preferences-dialog p{margin:4px 0;line-height:1.65}.preferences-dialog .row{margin-top:12px}#loginFeedback{color:#a42e2e}
 .preferences-dialog [hidden]{display:none!important}
-#driveSettings[hidden]{display:none!important}</style><script src="https://accounts.google.com/gsi/client" async defer></script><header><div><span class="brand-icon">▥</span><h1>منجرة الريم</h1><small>إدارة الحسابات والدفعات</small></div><span class="testflag">نسخة تجريبية مستقلة</span><div class="navlabel">مساحة العمل</div><div class="navitem selected">▦ &nbsp; الحسابات</div><button class="navitem nav-secondary" onclick="openStatements()">↙ &nbsp; الدفعات وكشوف الحساب</button><button class="navitem nav-secondary" onclick="openTrash()">سلة المحذوفات <span id="trashCount">0</span></button><div class="sidebar-bottom">منجرة الريم<br>إدارة بسيطة. حسابات واضحة.<br><span style="color:#789e8b">الإصدار التجريبي 2.7.1</span></div><button class="navitem nav-secondary" onclick="openSettings()">⚙ الإعدادات</button><button class="navitem nav-secondary" onclick="showSyncSettings()">المزامنة</button><small id="syncState" role="status">الحفظ على هذا الجهاز</small></header><main><div class="pagebar"><span>مساحة العمل &nbsp; / &nbsp; <b>الحسابات</b></span><span class="account-label"><span class="avatar">ر</span> منجرة الريم</span></div><div class="top"><div><div class="eyebrow">الإدارة المالية</div><h2>حساباتك، بوضوح.</h2><small id="today"></small></div><button class="primary" onclick="newAccount()">＋ إضافة حساب</button></div><div class="cards"><div class="card">إجمالي المتبقي لنا<strong class="green" id="ours"></strong><span class="caption">أرصدة مستحقة للتحصيل</span></div><div class="card">إجمالي المتبقي علينا<strong class="red" id="theirs"></strong><span class="caption">التزامات مستحقة للدفع</span></div><div class="card">صافي الرصيد <span class="muted">(لنا − علينا)</span><strong id="net"></strong><span class="caption">الفرق بين حقوقك والتزاماتك</span></div></div><div class="section-title">سجل الحسابات <span class="counter" id="accountCount">0 حساب</span></div><div class="status-tabs" role="group" aria-label="حالة الحساب"><button id="status-unpaid" onclick="setStatusFilter('unpaid')">غير مسددة</button><button id="status-paid" onclick="setStatusFilter('paid')">مسددة</button><button id="status-all" onclick="setStatusFilter('all')">جميع الحسابات</button></div><p class="status-hint">الحسابات المسددة والأرصدة لصالح الزبون تظهر ضمن فلتر «مسددة». البحث يشمل القائمة والحالة المختارتين.</p><div class="toolbar"><div class="tabs"><button id="tab-us" class="active" onclick="switchTab('us')">لنا (حساب)</button><button id="tab-them" onclick="switchTab('them')">علينا (حساب)</button></div><input id="search" placeholder="البحث باسم العميل، الصنف أو رقم الشيك…" oninput="render()"><button onclick="backup()">تصدير نسخة مشفّرة ↓</button><button onclick="document.getElementById('restore').click()">استيراد نسخة ↑</button><button type="button" onclick="openDriveRestore()">استعادة من Google Drive</button><input type="file" id="restore" accept=".alreembak,.xlsx,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,application/octet-stream" tabindex="-1" style="position:fixed;left:-10000px;top:0;width:1px;min-width:0;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="restoreFile(this)"></div><div class="panel"><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>نوع الصنف</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="list"></tbody></table></div><div id="empty" class="empty"><span class="empty-icon">▤</span>دفترك جاهز لأول حساب<br><p class="muted">ابدأ بإضافة حسابك الأول، ثم سجّل دفعاته بسهولة.</p><button onclick="newAccount()">＋ إضافة حساب</button></div></div><p class="notice">هذه نسخة تجريبية مستقلة عن الصفحة الأساسية. يمكنك حفظ الحسابات على هذا الجهاز أو تفعيل المزامنة بين أجهزتك. النسخ الجديدة مشفّرة وتشمل الحسابات والدفعات وسلة المحذوفات. يمكنك استيراد النسخ القديمة أيضًا.</p><div class="backupbar"><span id="backupDate">لم تُصدّر نسخة احتياطية بعد</span><span>العملة: شيكل إسرائيلي · ₪ &nbsp; <span id="exporting"></span></span></div></main><dialog id="settingsDialog" class="preferences-dialog" aria-labelledby="settingsTitle">
+#driveSettings[hidden]{display:none!important}</style><script src="https://accounts.google.com/gsi/client" async defer></script><header><div><span class="brand-icon">▥</span><h1 id="businessHeading">منجرة الريم</h1><small>إدارة الحسابات والدفعات</small></div><span class="testflag">نسخة تجريبية مستقلة</span><div class="navlabel">مساحة العمل</div><div class="navitem selected">▦ &nbsp; الحسابات</div><button class="navitem nav-secondary" onclick="openStatements()">↙ &nbsp; الدفعات وكشوف الحساب</button><button class="navitem nav-secondary" onclick="openTrash()">سلة المحذوفات <span id="trashCount">0</span></button><div class="sidebar-bottom">منجرة الريم<br>إدارة بسيطة. حسابات واضحة.<br><span style="color:#789e8b">الإصدار التجريبي 2.7.1</span></div><button class="navitem nav-secondary" onclick="openSettings()">⚙ الإعدادات</button><button class="navitem nav-secondary" onclick="showSyncSettings()">المزامنة</button><small id="syncState" role="status">الحفظ على هذا الجهاز</small></header><main><div class="pagebar"><span>مساحة العمل &nbsp; / &nbsp; <b>الحسابات</b></span><span class="account-label"><span class="avatar">ر</span> <span id="businessLabel">منجرة الريم</span></span></div><div class="top"><div><div class="eyebrow">الإدارة المالية</div><h2>حساباتك، بوضوح.</h2><small id="today"></small></div><button class="primary" onclick="newAccount()">＋ إضافة حساب</button></div><div class="cards"><div class="card">إجمالي المتبقي لنا<strong class="green" id="ours"></strong><span class="caption">أرصدة مستحقة للتحصيل</span></div><div class="card">إجمالي المتبقي علينا<strong class="red" id="theirs"></strong><span class="caption">التزامات مستحقة للدفع</span></div><div class="card">صافي الرصيد <span class="muted">(لنا − علينا)</span><strong id="net"></strong><span class="caption">الفرق بين حقوقك والتزاماتك</span></div></div><div class="section-title">سجل الحسابات <span class="counter" id="accountCount">0 حساب</span></div><div class="status-tabs" role="group" aria-label="حالة الحساب"><button id="status-unpaid" onclick="setStatusFilter('unpaid')">غير مسددة</button><button id="status-paid" onclick="setStatusFilter('paid')">مسددة</button><button id="status-all" onclick="setStatusFilter('all')">جميع الحسابات</button></div><p class="status-hint">الحسابات المسددة والأرصدة لصالح الزبون تظهر ضمن فلتر «مسددة». البحث يشمل القائمة والحالة المختارتين.</p><div class="toolbar"><div class="tabs"><button id="tab-us" class="active" onclick="switchTab('us')">لنا (حساب)</button><button id="tab-them" onclick="switchTab('them')">علينا (حساب)</button></div><input id="search" placeholder="البحث باسم العميل، الصنف أو رقم الشيك…" oninput="render()"><button onclick="backup()">تصدير نسخة مشفّرة ↓</button><button onclick="document.getElementById('restore').click()">استيراد نسخة ↑</button><button type="button" onclick="openDriveRestore()">استعادة من Google Drive</button><input type="file" id="restore" accept=".alreembak,.xlsx,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,application/octet-stream" tabindex="-1" style="position:fixed;left:-10000px;top:0;width:1px;min-width:0;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="restoreFile(this)"></div><div class="panel"><div class="scroll"><table><thead><tr><th>صاحب الحساب</th><th>نوع الصنف</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead><tbody id="list"></tbody></table></div><div id="empty" class="empty"><span class="empty-icon">▤</span>دفترك جاهز لأول حساب<br><p class="muted">ابدأ بإضافة حسابك الأول، ثم سجّل دفعاته بسهولة.</p><button onclick="newAccount()">＋ إضافة حساب</button></div></div><p class="notice">هذه نسخة تجريبية مستقلة عن الصفحة الأساسية. يمكنك حفظ الحسابات على هذا الجهاز أو تفعيل المزامنة بين أجهزتك. النسخ الجديدة مشفّرة وتشمل الحسابات والدفعات وسلة المحذوفات. يمكنك استيراد النسخ القديمة أيضًا.</p><div class="backupbar"><span id="backupDate">لم تُصدّر نسخة احتياطية بعد</span><span>العملة: شيكل إسرائيلي · ₪ &nbsp; <span id="exporting"></span></span></div></main><dialog id="settingsDialog" class="preferences-dialog" aria-labelledby="settingsTitle">
   <h2 id="settingsTitle">الإعدادات</h2>
+  <form id="businessForm"><label>اسم المنشأة<input id="businessSettings" maxlength="100" required></label><button type="submit">حفظ اسم المنشأة</button></form>
+  <div class="share-step"><h3>مزامنة Firebase</h3><button type="button" id="firebaseSettings" onclick="showSyncSettings()">إعداد حساب المزامنة</button></div>
+  <h3>النسخ الاحتياطي</h3>
   <form id="backupSettingsForm">
     <label for="backupMode">النسخ الاحتياطي التلقائي بعد كل حفظ</label>
     <select id="backupMode" onchange="renderDriveSettings()">
@@ -30,7 +33,8 @@ html[data-login-locked] #loginScreen{display:block}
       <option value="local">حفظ نسخة داخل التطبيق</option><option value="drive">حفظ في Google Drive</option>
       <option id="folderMode" value="folder">حفظ في مجلد أختاره</option>
     </select>
-    <div id="driveSettings">
+    <div id="driveSettings" class="share-step">
+      <h3>Google Drive</h3>
       <p id="driveConnection" role="status"></p>
       <div id="driveClientRow"><label for="driveClientId">معرّف OAuth لتطبيق الويب</label><input id="driveClientId" dir="ltr" placeholder="…apps.googleusercontent.com"></div>
       <button type="button" onclick="connectDrive()">ربط حساب Gmail</button>
@@ -55,6 +59,7 @@ html[data-login-locked] #loginScreen{display:block}
   <h2 id="loginTitle">تسجيل الدخول</h2>
   <p class="muted">بيانات الدخول تخص هذا المتصفح. احتفظ بها لاستعادة النسخ المشفّرة، حتى عند الانتقال إلى جهاز آخر.</p>
   <form id="loginForm">
+    <label id="businessSetupRow" hidden>اسم المنشأة<input id="businessSetup" maxlength="100" autocomplete="organization"></label>
     <label for="loginUsername">اسم المستخدم</label>
     <input id="loginUsername" name="username" autocomplete="username" maxlength="80" required>
     <label for="loginPassword">كلمة المرور</label>
@@ -128,7 +133,7 @@ if(await commit(base.map(x=>changed.get(x.id)||x))){paymentSession=null;$('payme
 refreshPaymentViews(a.id);toast(original?'تم تعديل الدفعة وتحديث الرصيد':'تم حفظ الدفعة مرة واحدة')}}finally{paymentBusy=false;$('savePayment').disabled=false}};
 
 function filterClientCheques(){const a=accounts.find(a=>a.id===selected);if(a)$('clientPaymentList').innerHTML=clientPayments(clientRows(a),true,$('detailChequeSearch').value)}
-function printAccount(){const a=accounts.find(a=>a.id===selected);if(!a)return;const rows=clientRows(a),t=totals(rows);$('print').innerHTML=`<h1>منجرة الريم — كشف حساب</h1><p>تاريخ الإصدار: ${today()}</p><h2>${esc(a.name)}</h2>${a.phone?`<p>الهاتف: <span dir="ltr">+${esc(a.phone)}</span></p>`:''}<p>القائمة: ${a.side==='us'?'لنا':'علينا'} · عدد الحركات: ${rows.length}</p><p>الإجمالي: ${money(t.amount)} · المدفوع: ${money(t.paid)} · المتبقي: ${statementBalance(t.left,a.side)}</p>${ledgerTable(rows,false)}<h3>تفاصيل الدفعات</h3>${clientPayments(rows,false)}<p>التوقيع: __________________</p>`;window.print()}
+function printAccount(){const a=accounts.find(a=>a.id===selected);if(!a)return;const rows=clientRows(a),t=totals(rows);$('print').innerHTML=`<h1>${esc(businessName())} — كشف حساب</h1><p>تاريخ الإصدار: ${today()}</p><h2>${esc(a.name)}</h2>${a.phone?`<p>الهاتف: <span dir="ltr">+${esc(a.phone)}</span></p>`:''}<p>القائمة: ${a.side==='us'?'لنا':'علينا'} · عدد الحركات: ${rows.length}</p><p>الإجمالي: ${money(t.amount)} · المدفوع: ${money(t.paid)} · المتبقي: ${statementBalance(t.left,a.side)}</p>${ledgerTable(rows,false)}<h3>تفاصيل الدفعات</h3>${clientPayments(rows,false)}<p>التوقيع: __________________</p>`;window.print()}
 
 function legacyBackup(){const blob=new Blob([JSON.stringify({version:1,accounts},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='hisabat-backup-'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 accounts=normalizeAccounts(accounts);$('trashCount').textContent=trash.length;$('today').textContent=new Date().toLocaleDateString('ar-PS',{weekday:'long',year:'numeric',month:'long',day:'numeric'});render();
@@ -231,7 +236,7 @@ async function emptyTrash(){if(!trash.length)return;if(!confirm('إفراغ سل
 function normalizePhone(value){const raw=normalizedSearch(value).replace(/[\s().-]/g,'');if(!raw)return '';if(!/^(\+|00)?\d+$/.test(raw))return null;let digits=raw.replace(/^\+/,'').replace(/^00/,'');if(/^05\d{8}$/.test(digits))digits='970'+digits.slice(1);return /^[1-9]\d{8,14}$/.test(digits)?digits:null}
 function fillExistingPhone(){const f=$('accountForm').elements,a=accounts.find(a=>normalizedName(a.name)===normalizedName(f.namedItem('name').value));if(a)f.namedItem('phone').value=a.phone?'+'+a.phone:''}
 let whatsappAccountId=null;
-function openWhatsApp(id){const a=accounts.find(a=>a.id===id);if(!a)return;const phone=normalizePhone(a.phone||'');if(!phone){alert('أضف رقم هاتف صحيحًا من زر تعديل الحساب أولًا.');return}whatsappAccountId=id;const rows=clientRows(a),t=totals(rows),message='مرحبًا '+a.name+'،\nكشف حساب منجرة الريم بتاريخ '+today()+'\nالقائمة: '+(a.side==='us'?'لنا':'علينا')+'\nالإجمالي: '+money(t.amount)+'\nالمدفوع: '+money(t.paid)+'\nالمتبقي: '+statementBalance(t.left,a.side)+'\nيرجى الاطلاع على ملف كشف الحساب المرفق.';$('whatsappRecipient').textContent=a.name+' · +'+phone+' · '+(a.side==='us'?'لنا':'علينا');$('whatsappLink').href='https://wa.me/'+phone+'?text='+encodeURIComponent(message);$('whatsappDialog').showModal()}
+function openWhatsApp(id){const a=accounts.find(a=>a.id===id);if(!a)return;const phone=normalizePhone(a.phone||'');if(!phone){alert('أضف رقم هاتف صحيحًا من زر تعديل الحساب أولًا.');return}whatsappAccountId=id;const rows=clientRows(a),t=totals(rows),message='مرحبًا '+a.name+'،\nكشف حساب '+businessName()+' بتاريخ '+today()+'\nالقائمة: '+(a.side==='us'?'لنا':'علينا')+'\nالإجمالي: '+money(t.amount)+'\nالمدفوع: '+money(t.paid)+'\nالمتبقي: '+statementBalance(t.left,a.side)+'\nيرجى الاطلاع على ملف كشف الحساب المرفق.';$('whatsappRecipient').textContent=a.name+' · +'+phone+' · '+(a.side==='us'?'لنا':'علينا');$('whatsappLink').href='https://wa.me/'+phone+'?text='+encodeURIComponent(message);$('whatsappDialog').showModal()}
 function printWhatsAppStatement(){if(!accounts.some(a=>a.id===whatsappAccountId)){alert('هذا الحساب لم يعد موجودًا.');return}selected=whatsappAccountId;printAccount()}
 
 const backupPreferencesKey = KEY + '-backup-mode';
@@ -427,9 +432,37 @@ async function passwordVerifier(password, salt) {
   return Array.from(new Uint8Array(bits)).join(',');
 }
 
+function businessName() {
+  return loginRecord()?.businessName || 'منجرة الريم';
+}
+
+function renderBusinessName() {
+  const name = businessName();
+  $('businessHeading').textContent = name;
+  $('businessLabel').textContent = name;
+  $('businessSettings').value = name;
+  document.title = name + ' | النسخة التجريبية';
+}
+
+$('businessForm').onsubmit = event => {
+  event.preventDefault();
+  if (!backupCredentials) return;
+  const name = $('businessSettings').value.trim();
+  if (!name) return;
+  try {
+    localStorage.setItem(loginKey, JSON.stringify({...loginRecord(), businessName:name}));
+    renderBusinessName();
+    toast('تم حفظ اسم المنشأة.');
+  } catch {
+    alert('تعذّر حفظ اسم المنشأة في هذا المتصفح.');
+  }
+};
+
 function requireLocalLogin() {
   const record = loginRecord();
   const setup = !record;
+  $('businessSetupRow').hidden = !setup;
+  $('businessSetup').required = setup;
   $('loginTitle').textContent = setup ? 'إعداد تسجيل الدخول' : 'تسجيل الدخول';
   $('loginSubmit').textContent = setup ? 'إنشاء بيانات الدخول' : 'دخول';
   $('loginPassword').autocomplete = setup ? 'new-password' : 'current-password';
@@ -456,7 +489,9 @@ $('loginForm').onsubmit = async event => {
       const salt = Array.from(crypto.getRandomValues(new Uint8Array(16)));
       const verifier = await passwordVerifier(password, salt);
       if (loginRecord()) throw Error('أُنشئت بيانات الدخول في تبويب آخر. أعد تحميل الصفحة وسجّل الدخول.');
-      record = {id:crypto.randomUUID(), username, salt, verifier};
+      const businessName = $('businessSetup').value.trim();
+      if (!businessName) throw Error('أدخل اسم المنشأة.');
+      record = {id:crypto.randomUUID(), username, salt, verifier, businessName};
       localStorage.setItem(loginKey, JSON.stringify(record));
     } else if (username !== record.username || await passwordVerifier(password, record.salt) !== record.verifier) {
       throw Error('اسم المستخدم أو كلمة المرور غير صحيحة.');
@@ -471,6 +506,7 @@ $('loginForm').onsubmit = async event => {
     render();
     $('trashCount').textContent = trash.length;
     backupCredentials = credentials;
+    renderBusinessName();
     requireLocalLogin();
   } catch (error) {
     $('loginFeedback').textContent = error.message || 'تعذّر تسجيل الدخول.';
