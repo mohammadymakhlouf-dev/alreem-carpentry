@@ -66,6 +66,7 @@ html[data-login-locked] #loginScreen{display:block}
 <h2 id="syncTitle">المزامنة بين الأجهزة</h2>
 <p class="muted">استخدم بريد المزامنة وكلمة المرور نفسيهما على كل جهاز. عند الاتصال تُعرض حسابات Firebase. عند قطع الاتصال تعود إلى حسابات هذا الجهاز.</p>
 <form id="syncAuthForm">
+<label>سجل المزامنة<select id="syncLedger"><option value="androidSubscriptionLedgers">السجل المشترك مع أندرويد</option><option value="testLedgers">سجل الويب التجريبي السابق</option></select></label>
 <label for="syncEmail">بريد المزامنة</label><input id="syncEmail" type="email" autocomplete="username" required>
 <label for="syncPassword">كلمة مرور المزامنة</label><input id="syncPassword" type="password" autocomplete="current-password" required minlength="8">
 <label><input id="syncCopyLocal" type="checkbox"> نسخ الحسابات المحلية إلى Firebase عند إنشاء سجل المزامنة لأول مرة</label>
@@ -653,7 +654,7 @@ function showSyncSettings() {
 }
 
 function syncError(error) {
-  if (error.code === 'permission-denied') return 'رفض Firebase الوصول إلى سجل الحساب. تحقّق من قواعد Firestore.';
+  if (error.code === 'permission-denied') return 'رفض Firebase العملية. تحقق من نشر قواعد السجل المشترك ومن صلاحية الاشتراك عند الحفظ.';
   if (error.code === 'auth/email-already-in-use') return 'هذا البريد مسجّل. اختر تسجيل الدخول.';
   if (error.code?.startsWith('auth/')) return 'تعذّر الدخول. تحقّق من البريد وكلمة المرور والاتصال.';
   if (error.code === 'unavailable') return 'الاتصال بالمزامنة غير متاح الآن. حاول مرة أخرى بعد عودة الاتصال.';
@@ -674,7 +675,19 @@ $('syncAuthForm').onsubmit = async event => {
     sdk = await loadSync();
     const method = create ? sdk.auth.createUserWithEmailAndPassword : sdk.auth.signInWithEmailAndPassword;
     const {user} = await method(sdk.authentication,email,password);
-    const ref = sdk.db.doc(sdk.firestore,'testLedgers',user.uid);
+    const collection = $('syncLedger').value;
+    if (collection === 'androidSubscriptionLedgers') {
+      const trial = sdk.db.doc(sdk.firestore,'androidTrials',user.uid);
+      const subscription = sdk.db.doc(sdk.firestore,'androidSubscriptions',user.uid);
+      await sdk.db.runTransaction(sdk.firestore, async transaction => {
+        const managed = await transaction.get(subscription);
+        const existing = await transaction.get(trial);
+        if (!managed.exists() && !existing.exists()) {
+          transaction.set(trial,{startedAt:sdk.db.serverTimestamp()});
+        }
+      });
+    }
+    const ref = sdk.db.doc(sdk.firestore,collection,user.uid);
     const first = await sdk.db.runTransaction(sdk.firestore, async transaction => {
       const snapshot = await transaction.get(ref);
       if (snapshot.exists()) return readCloud(snapshot);
