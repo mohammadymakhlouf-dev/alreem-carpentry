@@ -1,4 +1,4 @@
-const cacheName = 'alreem-trial-offline-18';
+const cacheName = 'alreem-trial-offline-19';
 const entry = new URL('./', self.registration.scope).href;
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(cacheName).then(cache => cache.add(new Request(entry,{cache:'reload'}))).then(() => self.skipWaiting()));
