@@ -553,6 +553,20 @@ $('loginForm').onsubmit = async event => {
 };
 
 async function signOut() {
+  if (offlineSession) {
+    if (offlineSession.saving || offlineSession.syncing) {
+      toast('انتظر اكتمال العملية الجارية.');
+      return;
+    }
+    const session = offlineSession;
+    session.reconnect = null;
+    offlineSession = cloudSession = null;
+    if (firebaseSync) await firebaseSync.auth.signOut(firebaseSync.authentication).catch(() => {});
+    backupCredentials = null;
+    document.documentElement.setAttribute('data-login-locked','');
+    location.reload();
+    return;
+  }
   if (cloudBusy || localSaving) return;
   if (cloudSession) await disconnectCloud();
   if (cloudSession) return;
@@ -758,7 +772,7 @@ function applyCloud(session, data) {
 
 function syncDialogState() {
   $('syncAuthForm').hidden = !!cloudSession;
-  $('disconnectSync').hidden = !cloudSession;
+  $('disconnectSync').hidden = !cloudSession || !!offlineSession;
   $('syncFeedback').textContent = cloudMessage;
 }
 
@@ -827,6 +841,176 @@ $('firebaseResetPassword').onclick = async () => {
   }
 };
 
+let offlineSession;
+const OFFLINE_CONFLICT = 'تعارضت تعديلات الجهاز مع تعديلات في السجل السحابي. بقيت نسختك محفوظة هنا؛ صدّر نسخة قبل تسوية التعارض.';
+
+function sameOffline(a,b) { return JSON.stringify(a) === JSON.stringify(b); }
+
+function mergeOfflineRows(base, local, remote) {
+  const maps = [base, local, remote].map(rows => new Map(rows.map(row => [row.id,row])));
+  const ids = new Set([...maps[2].keys(), ...maps[1].keys(), ...maps[0].keys()]);
+  const rows = [];
+  for (const id of ids) {
+    const [before, device, cloud] = maps.map(map => map.get(id));
+    if (!sameOffline(before,device) && !sameOffline(before,cloud) && !sameOffline(device,cloud)) {
+      throw Error(OFFLINE_CONFLICT);
+    }
+    const row = sameOffline(before,device) ? cloud : device;
+    if (row) rows.push(row);
+  }
+  return rows;
+}
+
+function mergeOfflineLedger(base, local, remote) {
+  const deviceNameChanged = local.businessName !== base.businessName;
+  if (deviceNameChanged && remote.businessName !== base.businessName && local.businessName !== remote.businessName) {
+    throw Error(OFFLINE_CONFLICT);
+  }
+  const merged = {
+    businessName: deviceNameChanged ? local.businessName : remote.businessName,
+    accounts:mergeOfflineRows(base.accounts,local.accounts,remote.accounts),
+    trash:mergeOfflineRows(base.trash,local.trash,remote.trash)
+  };
+  try { validateState(merged.accounts,merged.trash); }
+  catch { throw Error(OFFLINE_CONFLICT); }
+  return merged;
+}
+
+async function offlineKey(email) {
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email));
+  return KEY + '-cloud-cache-' + Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function readOfflineCache(key, credentials) {
+  const raw = localStorage.getItem(key);
+  if (!raw) return {raw, data:null};
+  const bytes = Uint8Array.from(atob(raw), char => char.charCodeAt(0));
+  const data = JSON.parse(new TextDecoder().decode(await decryptBackup(bytes.buffer, credentials)));
+  validateState(data.local.accounts,data.local.trash);
+  return {raw,data};
+}
+
+async function storeOffline(session, data) {
+  const bytes = await encryptBackup(JSON.stringify(data), session.credentials);
+  let binary = '';
+  for (let offset = 0; offset < bytes.length; offset += 16384) {
+    binary += String.fromCharCode(...bytes.subarray(offset,offset+16384));
+  }
+  if (offlineSession && offlineSession !== session) throw Error('أُغلقت جلسة الحساب.');
+  if (localStorage.getItem(session.key) !== session.raw) throw Error('تغيّر السجل في تبويب آخر. أعد فتح الحساب.');
+  const raw = btoa(binary);
+  localStorage.setItem(session.key,raw);
+  session.raw = raw;
+  session.data = data;
+}
+
+function renderOffline(session) {
+  const local = session.data.local;
+  session.businessName = local.businessName;
+  updateCloudViews(local);
+  renderBusinessName();
+}
+
+function useOfflineSession(session) {
+  offlineSession = cloudSession = session;
+  backupCredentials = session.credentials;
+  renderOffline(session);
+  syncStatus('الحساب: ' + session.email + ' · الحفظ على هذا الجهاز');
+  syncDialogState();
+  document.documentElement.removeAttribute('data-login-locked');
+  void flushOffline();
+}
+
+async function commitOffline(next,nextTrash,businessName) {
+  const session = offlineSession;
+  if (session.saving) return false;
+  session.saving = true;
+  try {
+    const local = {accounts:normalizeAccounts(next),trash:nextTrash,businessName};
+    validateState(local.accounts,local.trash);
+    cloudPayload(local.accounts,local.trash,local.businessName);
+    await storeOffline(session,{...session.data,local});
+    renderOffline(session);
+    queueAutomaticBackup();
+    syncStatus('تم الحفظ على الجهاز · بانتظار المزامنة');
+    return true;
+  } catch (error) {
+    alert(error.message);
+    return false;
+  } finally {
+    session.saving = false;
+    void flushOffline();
+  }
+}
+
+async function flushOffline() {
+  const session = offlineSession;
+  if (!session || session.syncing || session.saving || navigator.onLine === false || session.authRejected) return;
+  session.syncing = true;
+  try {
+    const sdk = await loadSync();
+    let user = sdk.authentication.currentUser;
+    if (user?.uid !== session.data.uid) {
+      if (!session.reconnect) throw Error('سجّل الدخول مرة أخرى لمزامنة التعديلات المحفوظة.');
+      user = await session.reconnect(sdk);
+      if (user.uid !== session.data.uid) {
+        await sdk.auth.signOut(sdk.authentication);
+        throw Error('البريد مرتبط بحساب مختلف. بقيت نسخة الجهاز محفوظة.');
+      }
+    }
+    session.reconnect = null;
+    const sent = session.data;
+    const ref = sdk.db.doc(sdk.firestore,'androidSubscriptionLedgers',user.uid);
+    const confirmed = await sdk.db.runTransaction(sdk.firestore, async transaction => {
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists()) throw Error('تعذّر العثور على السجل السحابي. بقيت نسخة الجهاز محفوظة.');
+      const {revision,...remote} = readCloud(snapshot);
+      const merged = mergeOfflineLedger(sent.base,sent.local,remote);
+      if (sameOffline(merged.accounts,remote.accounts) && sameOffline(merged.trash,remote.trash) && merged.businessName === remote.businessName) {
+        return remote;
+      }
+      transaction.update(ref,{revision:revision+1,payload:cloudPayload(merged.accounts,merged.trash,merged.businessName)});
+      return merged;
+    });
+    if (offlineSession !== session || session.saving) return;
+    session.saving = true;
+    try {
+      const latest = session.data.local;
+      const local = mergeOfflineLedger(sent.local,latest,confirmed);
+      if (!sameOffline(session.data.base,confirmed) || !sameOffline(latest,local)) {
+        await storeOffline(session,{uid:sent.uid,base:confirmed,local});
+        if (!sameOffline(latest,local)) renderOffline(session);
+      }
+      syncStatus('الحساب: ' + session.email + ' · تمت المزامنة');
+    } finally {
+      session.saving = false;
+    }
+  } catch (error) {
+    if (offlineSession !== session) return;
+    if (['auth/invalid-credential','auth/wrong-password','auth/user-disabled','auth/user-not-found'].includes(error.code)) {
+      session.reconnect = null;
+      session.authRejected = true;
+      syncStatus('تعذّر تسجيل الدخول للمزامنة. بيانات الجهاز محفوظة؛ أعد الدخول بكلمة المرور الحالية.');
+    } else {
+      syncStatus(error.message === OFFLINE_CONFLICT ? OFFLINE_CONFLICT :
+        error.code === 'permission-denied' ? 'الحفظ على الجهاز مستمر. تعذّر رفع التعديلات؛ تحقق من الاشتراك وصلاحيات الحساب.' :
+        'الحفظ على الجهاز مستمر · المزامنة تنتظر الاتصال');
+    }
+  } finally {
+    session.syncing = false;
+  }
+}
+
+window.addEventListener('online',flushOffline);
+window.addEventListener('offline',() => {
+  if (offlineSession) syncStatus('دون إنترنت · الحفظ على هذا الجهاز');
+});
+setInterval(flushOffline,12000);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./offline-worker.js').catch(() => {});
+}
+
 $('firebaseLoginForm').onsubmit = async event => {
   event.preventDefault();
   if (cloudBusy || backupCredentials) return;
@@ -844,6 +1028,30 @@ $('firebaseLoginForm').onsubmit = async event => {
   cloudBusy = true;
   let sdk;
   try {
+    const credentials = await crypto.subtle.importKey('raw',
+      new TextEncoder().encode(JSON.stringify([email, password])), 'PBKDF2', false, ['deriveKey']);
+    const key = await offlineKey(email);
+    let cached;
+    let lockedCache = false;
+    try { cached = await readOfflineCache(key,credentials); }
+    catch {
+      lockedCache = true;
+      cached = {raw:localStorage.getItem(key),data:null};
+    }
+    const session = {email,key,credentials,raw:cached.raw,data:cached.data};
+    if (!create && cached.data) {
+      session.reconnect = async client => {
+        const {user} = await client.auth.signInWithEmailAndPassword(client.authentication,email,password);
+        return user;
+      };
+      useOfflineSession(session);
+      form.reset();
+      feedback.textContent = '';
+      return;
+    }
+    if (navigator.onLine === false) {
+      throw Error(lockedCache ? 'كلمة المرور لا تفتح نسخة الجهاز.' : 'اتصل بالإنترنت أول مرة لتنزيل سجل حسابك على هذا الجهاز.');
+    }
     feedback.textContent = 'جارٍ الاتصال بـ Firebase…';
     sdk = await loadSync();
     await sdk.auth.setPersistence(sdk.authentication, sdk.auth.inMemoryPersistence);
@@ -853,13 +1061,20 @@ $('firebaseLoginForm').onsubmit = async event => {
     if (create || completingProfile) {
       await sdk.auth.updateProfile(user, {displayName:username});
     }
-    const credentials = await crypto.subtle.importKey('raw',
-      new TextEncoder().encode(JSON.stringify([email, password])), 'PBKDF2', false, ['deriveKey']);
+
     const {ref, first} = await openSharedLedger(sdk, user, false, create || completingProfile ? businessName : '');
-    backupCredentials = credentials;
-    attachCloud(sdk, user, ref, first);
-    cloudSession.primaryLogin = true;
-    renderBusinessName();
+    if (lockedCache) {
+      backupCredentials = credentials;
+      attachCloud(sdk,user,ref,first);
+      cloudSession.primaryLogin = true;
+      document.documentElement.removeAttribute('data-login-locked');
+      form.reset();
+      toast('فُتح السجل السحابي. النسخة المحلية السابقة بقيت مشفّرة بكلمة المرور القديمة.');
+      return;
+    }
+    const {revision,...ledger} = first;
+    await storeOffline(session,{uid:user.uid,base:ledger,local:ledger});
+    useOfflineSession(session);
     form.reset();
     feedback.textContent = '';
     document.documentElement.removeAttribute('data-login-locked');
@@ -957,6 +1172,7 @@ async function disconnectCloud() {
 }
 
 async function commit(next, nextTrash = trash, businessName = cloudSession?.businessName || '') {
+  if (offlineSession) return commitOffline(next,nextTrash,businessName);
   if (!backupCredentials || localSaving) return false;
   const session = cloudSession;
   if (cloudBusy) {
