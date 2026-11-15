@@ -78,6 +78,17 @@ html[data-login-locked] #loginScreen{display:block}
 <section id="loginScreen" class="preferences-dialog" aria-labelledby="loginTitle">
   <h2 id="loginTitle">تسجيل الدخول</h2>
   <p class="muted">بيانات الدخول تخص هذا المتصفح. احتفظ بها لاستعادة النسخ المشفّرة، حتى عند الانتقال إلى جهاز آخر.</p>
+  <form id="firebaseLoginForm">
+    <label>اسم المنشأة عند إنشاء حساب جديد<input id="firebaseBusinessName" maxlength="100" autocomplete="organization"></label>
+    <label>اسم المستخدم عند إنشاء حساب جديد<input id="firebaseUsername" maxlength="80" autocomplete="nickname"></label>
+    <label>البريد الإلكتروني<input id="firebaseEmail" type="email" autocomplete="username" required></label>
+    <label>كلمة المرور<input id="firebasePassword" type="password" autocomplete="current-password" required></label>
+    <button class="primary" type="submit" value="login">تسجيل الدخول</button>
+    <button type="submit" value="create">إنشاء حساب في Firebase</button>
+    <button id="firebaseResetPassword" type="button">نسيت كلمة المرور؟</button>
+    <p id="firebaseLoginFeedback" role="status"></p>
+  </form>
+  <details><summary>الدخول إلى سجل الجهاز والنسخ القديمة</summary>
   <form id="loginForm">
     <label id="businessSetupRow" hidden>اسم المنشأة<input id="businessSetup" maxlength="100" autocomplete="organization"></label>
     <label for="loginUsername">اسم المستخدم</label>
@@ -87,6 +98,7 @@ html[data-login-locked] #loginScreen{display:block}
     <button id="loginSubmit" class="primary" type="submit">دخول</button>
     <p id="loginFeedback" role="status" aria-live="polite"></p>
   </form>
+</details>
 </section>
 <dialog id="syncDialog" class="preferences-dialog" aria-labelledby="syncTitle" oncancel="if(cloudBusy)event.preventDefault()">
 <h2 id="syncTitle">المزامنة بين الأجهزة</h2>
@@ -453,7 +465,7 @@ async function passwordVerifier(password, salt) {
 }
 
 function businessName() {
-  return loginRecord()?.businessName || 'منجرة الريم';
+  return cloudSession?.businessName || loginRecord()?.businessName || 'منجرة الريم';
 }
 
 function renderBusinessName() {
@@ -464,11 +476,15 @@ function renderBusinessName() {
   document.title = name + ' | النسخة التجريبية';
 }
 
-$('businessForm').onsubmit = event => {
+$('businessForm').onsubmit = async event => {
   event.preventDefault();
   if (!backupCredentials) return;
   const name = $('businessSettings').value.trim();
   if (!name) return;
+  if (cloudSession) {
+    if (await commit(accounts, trash, name)) toast('تم حفظ اسم المنشأة.');
+    return;
+  }
   try {
     localStorage.setItem(loginKey, JSON.stringify({...loginRecord(), businessName:name}));
     renderBusinessName();
@@ -489,6 +505,7 @@ function requireLocalLogin() {
   $('loginPassword').minLength = setup ? 8 : 1;
   const signedIn = !!record && backupCredentials !== null;
   $('loginForm').reset();
+  $('loginForm').closest('details').open = !!record;
   $('loginFeedback').textContent = '';
   document.documentElement.toggleAttribute('data-login-locked', !signedIn);
   if (!signedIn) $('loginUsername').focus();
@@ -634,6 +651,44 @@ const syncConfig = {
 let firebaseSync;
 let cloudSession;
 let cloudBusy = false;
+function readLicense(snapshot) {
+  const data = snapshot.data();
+  const expiresAt = data?.expiresAt?.toMillis();
+  return data?.enabled === true && Number.isFinite(expiresAt)
+    ? {expiresAt, plan: ({trial:'تجريبي',annual:'سنوي',custom:'مخصص'})[data.plan] || 'نشط'}
+    : null;
+}
+
+const TRIAL_DURATION = 7 * 24 * 60 * 60 * 1000;
+
+function effectiveLicense(admin, trial) {
+  if (admin.exists()) return readLicense(admin);
+  const startedAt = trial.data()?.startedAt?.toMillis();
+  return Number.isFinite(startedAt)
+    ? {expiresAt: startedAt + TRIAL_DURATION, plan:'تجريبي'}
+    : null;
+}
+
+async function checkLicense(sdk, user, createTrial = false) {
+  const adminRef = sdk.db.doc(sdk.firestore, 'androidSubscriptions', user.uid);
+  const trialRef = sdk.db.doc(sdk.firestore, 'androidTrials', user.uid);
+  const {db, firestore} = sdk;
+  let [admin, trial] = await Promise.all([db.getDocFromServer(adminRef), db.getDocFromServer(trialRef)]);
+  if (createTrial && !admin.exists() && !trial.exists()) {
+    await db.runTransaction(firestore, async transaction => {
+      const managed = await transaction.get(adminRef);
+      const existing = await transaction.get(trialRef);
+      if (!managed.exists() && !existing.exists()) {
+        transaction.set(trialRef, {startedAt:db.serverTimestamp()});
+      }
+    });
+    [admin, trial] = await Promise.all([db.getDocFromServer(adminRef), db.getDocFromServer(trialRef)]);
+  }
+  const current = effectiveLicense(admin, trial);
+
+  return {adminRef, trial, admin, current};
+}
+
 let cloudMessage = 'الحفظ على هذا الجهاز';
 
 async function loadSync() {
@@ -656,8 +711,8 @@ function syncStatus(message) {
   $('syncFeedback').textContent = message;
 }
 
-function cloudPayload(records, deleted) {
-  const payload = JSON.stringify({version:2,accounts:records,trash:deleted});
+function cloudPayload(records, deleted, businessName = cloudSession?.businessName || '') {
+  const payload = JSON.stringify({version:2,accounts:records,trash:deleted,businessName});
   if (new TextEncoder().encode(payload).length > 950000) {
     throw Error('تجاوز حجم الحسابات حد النسخة التجريبية للمزامنة. صدّر نسخة احتياطية.');
   }
@@ -671,7 +726,8 @@ function readCloud(snapshot) {
   if (data.version !== 2) throw Error('صيغة السجل غير مدعومة.');
   const records = normalizeAccounts(data.accounts);
   validateState(records, data.trash);
-  return {revision, accounts:records, trash:data.trash};
+  return {revision, accounts:records, trash:data.trash,
+    businessName: typeof data.businessName === 'string' ? data.businessName.slice(0, 100) : ''};
 }
 
 function updateCloudViews(data) {
@@ -695,7 +751,9 @@ function applyCloud(session, data) {
     if ($('restoreDialog').open) cancelRestore();
   }
   session.revision = data.revision;
+  if (data.businessName !== undefined) session.businessName = data.businessName;
   updateCloudViews(data);
+  renderBusinessName();
 }
 
 function syncDialogState() {
@@ -717,6 +775,103 @@ function syncError(error) {
   return error.message || 'تعذّر الاتصال بالمزامنة.';
 }
 
+async function openSharedLedger(sdk, user, copyLocal, businessName = '') {
+  const subscription = await checkLicense(sdk, user, true);
+  const ref = sdk.db.doc(sdk.firestore, 'androidSubscriptionLedgers', user.uid);
+  const legacyRef = sdk.db.doc(sdk.firestore, 'testLedgers', user.uid);
+  const first = await sdk.db.runTransaction(sdk.firestore, async transaction => {
+    const snapshot = await transaction.get(ref);
+    if (snapshot.exists()) return readCloud(snapshot);
+    if (!subscription.current || subscription.current.expiresAt <= Date.now()) {
+      throw Error('يلزم اشتراك نشط لإنشاء سجل المزامنة.');
+    }
+    const legacy = await transaction.get(legacyRef);
+    const previous = legacy.exists() ? readCloud(legacy) : null;
+    const initial = {
+      revision: 1,
+      accounts: previous?.accounts ?? (copyLocal ? accounts : []),
+      trash: previous?.trash ?? (copyLocal ? trash : []),
+      businessName
+    };
+    transaction.set(ref, {revision:1, payload:cloudPayload(initial.accounts, initial.trash, businessName)});
+    return initial;
+  });
+  return {ref, first, subscription};
+}
+
+$('firebaseResetPassword').onclick = async () => {
+  if (cloudBusy || backupCredentials) return;
+  const emailField = $('firebaseEmail');
+  const feedback = $('firebaseLoginFeedback');
+  if (!emailField.reportValidity()) return;
+  const email = emailField.value.trim();
+  const button = $('firebaseResetPassword');
+  cloudBusy = true;
+  button.disabled = true;
+  feedback.textContent = 'جارٍ طلب رابط إعادة التعيين…';
+  const message = 'إذا كان البريد مرتبطًا بحساب، فسيصلك رابط لتعيين كلمة مرور جديدة. تحقق أيضًا من البريد غير المرغوب فيه.';
+  try {
+    const sdk = await loadSync();
+    sdk.authentication.languageCode = 'ar';
+    await sdk.auth.sendPasswordResetEmail(sdk.authentication, email);
+    feedback.textContent = message;
+  } catch (error) {
+    feedback.textContent = error.code === 'auth/user-not-found'
+      ? message
+      : error.code === 'auth/too-many-requests'
+        ? 'طلبات كثيرة. انتظر قليلًا ثم حاول مجددًا.'
+        : 'تعذّر إرسال رابط إعادة التعيين. تحقق من الاتصال وحاول مجددًا.';
+  } finally {
+    button.disabled = false;
+    cloudBusy = false;
+  }
+};
+
+$('firebaseLoginForm').onsubmit = async event => {
+  event.preventDefault();
+  if (cloudBusy || backupCredentials) return;
+  const form = event.currentTarget;
+  const feedback = $('firebaseLoginFeedback');
+  const email = $('firebaseEmail').value.trim().toLowerCase();
+  const password = $('firebasePassword').value;
+  const username = $('firebaseUsername').value.trim();
+  const businessName = $('firebaseBusinessName').value.trim();
+  const create = event.submitter?.value === 'create';
+  if (create && (!businessName || !username || password.length < 8)) {
+    feedback.textContent = 'أدخل اسم المنشأة واسم المستخدم، واختر كلمة مرور من 8 أحرف على الأقل.';
+    return;
+  }
+  cloudBusy = true;
+  let sdk;
+  try {
+    feedback.textContent = 'جارٍ الاتصال بـ Firebase…';
+    sdk = await loadSync();
+    await sdk.auth.setPersistence(sdk.authentication, sdk.auth.inMemoryPersistence);
+    const method = create ? sdk.auth.createUserWithEmailAndPassword : sdk.auth.signInWithEmailAndPassword;
+    const {user} = await method(sdk.authentication, email, password);
+    const completingProfile = !user.displayName && Boolean(username);
+    if (create || completingProfile) {
+      await sdk.auth.updateProfile(user, {displayName:username});
+    }
+    const credentials = await crypto.subtle.importKey('raw',
+      new TextEncoder().encode(JSON.stringify([email, password])), 'PBKDF2', false, ['deriveKey']);
+    const {ref, first} = await openSharedLedger(sdk, user, false, create || completingProfile ? businessName : '');
+    backupCredentials = credentials;
+    attachCloud(sdk, user, ref, first);
+    cloudSession.primaryLogin = true;
+    renderBusinessName();
+    form.reset();
+    feedback.textContent = '';
+    document.documentElement.removeAttribute('data-login-locked');
+  } catch (error) {
+    if (sdk && !cloudSession) await sdk.auth.signOut(sdk.authentication).catch(() => {});
+    feedback.textContent = syncError(error);
+  } finally {
+    $('firebasePassword').value = '';
+    cloudBusy = false;
+  }
+};
+
 $('syncAuthForm').onsubmit = async event => {
   event.preventDefault();
   if (cloudBusy || cloudSession) return;
@@ -731,15 +886,23 @@ $('syncAuthForm').onsubmit = async event => {
     sdk = await loadSync();
     const method = create ? sdk.auth.createUserWithEmailAndPassword : sdk.auth.signInWithEmailAndPassword;
     const {user} = await method(sdk.authentication,email,password);
-    const ref = sdk.db.doc(sdk.firestore,'testLedgers',user.uid);
-    const first = await sdk.db.runTransaction(sdk.firestore, async transaction => {
-      const snapshot = await transaction.get(ref);
-      if (snapshot.exists()) return readCloud(snapshot);
-      const initial = {revision:1,accounts:copyLocal ? accounts : [],trash:copyLocal ? trash : []};
-      transaction.set(ref,{revision:1,payload:cloudPayload(initial.accounts,initial.trash)});
-      return initial;
-    });
-    const session = {ref, revision:0, localAccounts:accounts, localTrash:trash, unsubscribe:null};
+    const {ref, first} = await openSharedLedger(sdk, user, copyLocal, loginRecord()?.businessName);
+    attachCloud(sdk, user, ref, first);
+    $('syncAuthForm').reset();
+    syncStatus('متصل · ' + user.email);
+    syncDialogState();
+    $('syncDialog').close();
+  } catch (error) {
+    if (sdk && !cloudSession) await sdk.auth.signOut(sdk.authentication).catch(() => {});
+    syncStatus(syncError(error));
+  } finally {
+    $('syncPassword').value = '';
+    cloudBusy = false;
+  }
+};
+
+function attachCloud(sdk, user, ref, first) {
+  const session = {ref, revision:0, localAccounts:accounts, localTrash:trash, unsubscribe:null};
     cloudSession = session;
     applyCloud(session,first);
     session.unsubscribe = sdk.db.onSnapshot(ref,{includeMetadataChanges:true}, snapshot => {
@@ -762,18 +925,9 @@ $('syncAuthForm').onsubmit = async event => {
         syncStatus(syncError(error));
       }
     }, error => syncStatus(syncError(error)));
-    $('syncAuthForm').reset();
-    syncStatus('متصل · ' + user.email);
-    syncDialogState();
-    $('syncDialog').close();
-  } catch (error) {
-    if (sdk && !cloudSession) await sdk.auth.signOut(sdk.authentication).catch(() => {});
-    syncStatus(syncError(error));
-  } finally {
-    $('syncPassword').value = '';
-    cloudBusy = false;
-  }
-};
+  syncStatus('متصل · ' + user.email);
+  syncDialogState();
+}
 
 async function disconnectCloud() {
   const session = cloudSession;
@@ -783,6 +937,12 @@ async function disconnectCloud() {
     await firebaseSync.auth.signOut(firebaseSync.authentication);
     session.unsubscribe?.();
     cloudSession = null;
+    if (session.primaryLogin) {
+      backupCredentials = null;
+      document.documentElement.setAttribute('data-login-locked', '');
+      location.reload();
+      return;
+    }
     if ($('detail').open) $('detail').close();
     if ($('payment').open) $('payment').close();
     if ($('entry').open) $('entry').close();
@@ -796,7 +956,7 @@ async function disconnectCloud() {
   }
 }
 
-async function commit(next, nextTrash = trash) {
+async function commit(next, nextTrash = trash, businessName = cloudSession?.businessName || '') {
   if (!backupCredentials || localSaving) return false;
   const session = cloudSession;
   if (cloudBusy) {
@@ -808,7 +968,7 @@ async function commit(next, nextTrash = trash) {
   try {
     next = normalizeAccounts(next);
     validateState(next,nextTrash);
-    const payload = cloudPayload(next,nextTrash);
+    const payload = cloudPayload(next,nextTrash,businessName);
     const revision = session.revision;
     const {db,firestore} = firebaseSync;
     await db.runTransaction(firestore, async transaction => {
@@ -818,7 +978,7 @@ async function commit(next, nextTrash = trash) {
       }
       transaction.update(session.ref,{revision:revision + 1,payload});
     });
-    applyCloud(session,{revision:revision+1,accounts:next,trash:nextTrash});
+    applyCloud(session,{revision:revision+1,accounts:next,trash:nextTrash,businessName});
     queueAutomaticBackup();
     return true;
   } catch (error) {
@@ -1044,6 +1204,7 @@ window.addEventListener('pageshow', event => {
 requireLocalLogin();
 
 </script></html>
+
 
 
 
